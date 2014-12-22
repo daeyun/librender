@@ -1,10 +1,11 @@
-include_directories(${SCRY_SOURCE_DIR}/src)
-include_directories(${SCRY_SOURCE_DIR}/src/third_party/tinyobjloader)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCRY_SOURCE_DIR}/bin)
 
+# Get all files except for ./src/main.cc and make them a library.
 file(GLOB_RECURSE INCLUDES "*.h" "*.cpp" "*.cc")
+list(REMOVE_ITEM INCLUDES ${SCRY_SOURCE_DIR}/src/main.cc)
 
-add_executable(scry main.cc ${INCLUDES})
+# Also used in ./test/CMakeLists.txt
+add_library (scry_lib ${INCLUDES})
 
-target_link_libraries(scry ${CORELIBS})
+add_executable(scry main.cc)
+target_link_libraries(scry scry_lib ${CORELIBS})

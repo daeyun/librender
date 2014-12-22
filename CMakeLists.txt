@@ -30,6 +30,10 @@ if(GIT_FOUND)
     add_definitions(-DVERSION=\"${VERSION_STRING}\")
 endif()
 
+# Used by both src and test
+include_directories(${SCRY_SOURCE_DIR}/src)
+include_directories(${SCRY_SOURCE_DIR}/src/third_party/tinyobjloader)
+
 add_subdirectory(src)
 
 if (test)
