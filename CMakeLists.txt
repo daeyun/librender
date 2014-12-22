@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 2.8.4)
+
+# Set -Dtest=ON to build unit tests.
+option(test "Build all tests." OFF)
+
 project(SCRY)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
@@ -8,11 +12,14 @@ find_package(GLUT REQUIRED)
 find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
 find_package(YamlCpp REQUIRED)
 find_package(Armadillo REQUIRED)
+set(CORELIBS ${ARMADILLO_LIBRARIES} ${Boost_LIBRARIES} ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${YAMLCPP_LIBRARY})
 
 set(CMAKE_CXX_FLAGS "-g -Wall")
 
 add_definitions(-std=c++11)
 
+# Pass in the version string at compile time.
+# From git:  git tag -a v0.1 -m 'version 0.1'
 find_package(Git)
 if(GIT_FOUND)
     execute_process(
@@ -24,3 +31,13 @@ if(GIT_FOUND)
 endif()
 
 add_subdirectory(src)
+
+if (test)
+    # This adds 'project(gmock)'
+    add_subdirectory(${SCRY_SOURCE_DIR}/lib/gmock-1.7.0)
+
+    add_subdirectory(test)
+
+    enable_testing()
+    add_test(NAME RunTests COMMAND runUnitTests)
+endif()
