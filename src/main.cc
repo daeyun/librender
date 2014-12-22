@@ -23,9 +23,9 @@ int main(int argc, char* argv[]) {
     options_t options;
     int parse_result = parse_options(argc, argv, options);
     if (parse_result > 0) {
-        return EXIT_SUCCESS;
+        return 0;
     } else if (parse_result < 0) {
-        return EXIT_FAILURE;
+        return -1;
     }
 
     config::load_config_file(options.config_file);
@@ -53,26 +53,25 @@ int parse_options(int argc, char** argv, options_t& options) {
 
     // Declare the supported options.
     po::options_description desc("Options");
-    desc.add_options()("version,v", "print version string")(
-        "help", "produce help message")(
-        "config-file,c",
-        po::value<std::string>()->default_value(default_rc.string()),
-        "path to configuration file")("resolution,r",
-                                      po::value<int>()->default_value(640),
-                                      "resolution of output images")(
-        "mesh-files", po::value<std::vector<std::string>>()->required(),
-        "supported file types: .obj");
+    auto config_opt = po::value<std::string>()->default_value(default_rc.string());
+    auto resolution_opt = po::value<int>()->default_value(640);
+    auto mesh_files_opt = po::value<std::vector<std::string>>()->required();
+    desc.add_options()
+        ("version,v", "print version string")
+        ("help", "produce help message")
+        ("config-file,c", config_opt, "path to configuration file")
+        ("resolution,r", resolution_opt, "resolution of output images")
+        ("mesh-files", mesh_files_opt, "supported file types: .obj");
+
+    po::positional_options_description positionalOptions;
+    positionalOptions.add("mesh-files", -1);
+    po::variables_map vm;
 
     try {
-        po::positional_options_description positionalOptions;
-        positionalOptions.add("mesh-files", -1);
-
-        po::variables_map vm;
         po::store(po::command_line_parser(argc, argv)
                       .options(desc)
                       .positional(positionalOptions)
-                      .run(),
-                  vm);
+                      .run(), vm);
 
         if (vm.count("help") || !vm.count("mesh-files")) {
             std::cout << kAppDesc << std::endl << std::endl << desc;

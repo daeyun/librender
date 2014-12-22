@@ -9,31 +9,33 @@
 void load_obj(const std::string obj_file, Mesh& mesh) {
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
+
     std::string err = tinyobj::LoadObj(shapes, materials, obj_file.c_str());
 
-    if (!err.empty()) throw std::runtime_error(err);
+    if (!err.empty())
+        throw std::runtime_error(err);
     if (shapes.empty())
-        throw std::runtime_error(std::string("Shape not found in " + obj_file));
+        throw std::runtime_error(std::string("Shape not found in ") + obj_file);
+
+    const int kDims = 3;
 
     for (tinyobj::shape_t shape : shapes) {
         if (shape.mesh.positions.empty())
-            throw std::runtime_error(
-                std::string("Vertex not found in " + obj_file));
+            throw std::runtime_error(std::string("Vertex not found in ") + obj_file);
         if (shape.mesh.indices.empty())
-            throw std::runtime_error(
-                std::string("Face not found in " + obj_file));
+            throw std::runtime_error(std::string("Face not found in ") + obj_file);
 
-        arma::fmat shape_v(&shape.mesh.positions[0], 3,
-                           shape.mesh.positions.size() / 3);
-        arma::umat shape_f(&shape.mesh.indices[0], 3,
-                           shape.mesh.indices.size() / 3);
-
+        int kNumVertex = shape.mesh.positions.size() / kDims;
+        int kNumFace = shape.mesh.indices.size() / kDims;
+        arma::fmat shape_v(&shape.mesh.positions[0], kDims, kNumVertex);
+        arma::umat shape_f(&shape.mesh.indices[0], kDims, kNumFace);
         arma::fmat shape_n;
+
         if (shape.mesh.normals.empty()) {
             compute_normals(shape_v, shape_f, shape_n);
         } else {
             shape_n = arma::conv_to<arma::fmat>::from(shape.mesh.normals);
-            shape_n.resize(3, shape.mesh.positions.size() / 3);
+            shape_n.resize(kDims, kNumVertex);
         }
 
         mesh.v = join_cols(mesh.v, shape_v);
