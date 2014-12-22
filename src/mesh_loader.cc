@@ -80,5 +80,5 @@ void normalize_coords(arma::fmat& v) {
     arma::fvec range = vmax - vmin;
 
     v.each_col() -= vmin + range / 2;
-    v.each_col() /= range;
+    v /= arma::max(range);
 }
