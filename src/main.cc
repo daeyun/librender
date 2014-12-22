@@ -73,13 +73,13 @@ int parse_options(int argc, char** argv, options_t& options) {
                       .positional(positionalOptions)
                       .run(), vm);
 
-        if (vm.count("help") || !vm.count("mesh-files")) {
-            std::cout << kAppDesc << std::endl << std::endl << desc;
+        if (vm.count("version")) {
+            std::cout << kAppName << " " << VERSION << std::endl;
             return 1;
         }
 
-        if (vm.count("version")) {
-            std::cout << kAppName << " " << VERSION << std::endl;
+        if (vm.count("help") || !vm.count("mesh-files")) {
+            std::cout << kAppDesc << std::endl << std::endl << desc;
             return 1;
         }
 
