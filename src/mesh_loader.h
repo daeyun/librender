@@ -2,7 +2,7 @@
 #define MESH_LOADER_H_
 
 #include <armadillo>
-#include "thirdparty/tiny_obj_loader.h"
+#include "tiny_obj_loader.h"
 #include "mesh.h"
 
 void load_obj(const std::string obj_file, Mesh& mesh);

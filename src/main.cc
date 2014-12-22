@@ -11,7 +11,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
-#include "thirdparty/tiny_obj_loader.h"
+#include "tiny_obj_loader.h"
 #include "config.h"
 #include "mesh_loader.h"
 #include "mesh.h"
