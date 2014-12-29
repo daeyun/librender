@@ -1,5 +1,4 @@
-#ifndef MAIN_H_
-#define MAIN_H_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -24,5 +23,3 @@ typedef struct {
 
 // Functions
 int parse_options(int argc, char** argv, options_t& options);
-
-#endif  // MAIN_H_

@@ -14,7 +14,9 @@
 #include "tiny_obj_loader.h"
 #include "config.h"
 #include "mesh_loader.h"
-#include "mesh.h"
+#include "scry_object.h"
+
+#include "graphics.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -28,18 +30,23 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    config::load_config_file(options.config_file);
+    ScryObject mesh;
+    load_obj(options.mesh_files[0], mesh);
 
-    for (std::string mesh_file : options.mesh_files) {
-        std::cout << mesh_file << std::endl;
+    render_object(mesh);
 
-        Mesh mesh;
-        try {
-            load_obj(mesh_file, mesh);
-        } catch (std::exception e) {
-            std::cerr << e.what() << std::endl;
-        }
-    }
+    //config::load_config_file(options.config_file);
+
+    //for (std::string mesh_file : options.mesh_files) {
+        //std::cout << mesh_file << std::endl;
+
+        //ScryObject mesh;
+        //try {
+            //load_obj(mesh_file, mesh);
+        //} catch (std::exception e) {
+            //std::cerr << e.what() << std::endl;
+        //}
+    //}
 }
 
 int parse_options(int argc, char** argv, options_t& options) {

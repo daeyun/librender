@@ -12,7 +12,14 @@ find_package(GLUT REQUIRED)
 find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
 find_package(YamlCpp REQUIRED)
 find_package(Armadillo REQUIRED)
-set(CORELIBS ${ARMADILLO_LIBRARIES} ${Boost_LIBRARIES} ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${YAMLCPP_LIBRARY})
+find_package(GLEW REQUIRED)
+
+find_package(PkgConfig REQUIRED)
+pkg_search_module(GLFW REQUIRED glfw3)
+
+
+set(CORELIBS ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${ARMADILLO_LIBRARIES} ${Boost_LIBRARIES} ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${YAMLCPP_LIBRARY})
+set(INCLUDE_DIRS ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS "-g -Wall")
 
@@ -26,17 +33,39 @@ if(GIT_FOUND)
         COMMAND ${GIT_EXECUTABLE} describe --abbrev=4 --dirty --always --tags --match "v[0-9]*"
         OUTPUT_VARIABLE DESCRIBE_BUILD
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-    string(REGEX MATCH "[0-9]+\\.[0-9]+-?[a-zA-Z]*" VERSION_STRING ${DESCRIBE_BUILD})
+    string(REGEX MATCH "[0-9]+\\.[0-9]+-?[a-zA-Z0-9-]*" VERSION_STRING ${DESCRIBE_BUILD})
     add_definitions(-DVERSION=\"${VERSION_STRING}\")
 endif()
+
+
+
+
+
+
+
+
+
 
 # Used by both src and test
 include_directories(${SCRY_SOURCE_DIR}/src)
 include_directories(${SCRY_SOURCE_DIR}/src/third_party/tinyobjloader)
+include_directories(${GLEW_INCLUDE_DIRS})
+
+
+
+
+
+
+
+
 
 add_subdirectory(src)
 
 if (test)
+
+    message(AAAAAAAAAAAAAAAAAAAA)
+
+
     # This adds 'project(gmock)'
     add_subdirectory(${SCRY_SOURCE_DIR}/lib/gmock-1.7.0)
 

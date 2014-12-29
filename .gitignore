@@ -1,7 +1,7 @@
 /build
 /bin
 /.ycm_extra_conf.*
-/.ropeproject
+.ropeproject
 
 ### C++ ###
 # Compiled Object files

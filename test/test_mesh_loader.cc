@@ -37,3 +37,27 @@ TEST(TestNormalizeCoords, CheckScalePreserved) {
 
     EXPECT_TRUE(is_close(v, u));
 }
+
+TEST(TestCrossCol, Simple) {
+    arma::fmat a = {0, 0, 0,  1, 1, 1,  2, 2, 2,  0, 1, 2};
+    arma::fmat b = {1, 0, 0,  0, 0, 0,  4, 3, 0,  2, 1, 1};
+    a.reshape(3, 4);
+    b.reshape(3, 4);
+
+    arma::fmat c;
+    cross_col(a, b, c);
+
+    arma::fmat expected = {0, 0, 0, 0, 0, 0, -6, 8, -2, -1, 4, -2};
+    expected.reshape(3, 4);
+
+    EXPECT_TRUE(is_close(c, expected));
+}
+
+TEST(TestLoadObj, Simple) {
+    Mesh mesh;
+    load_obj("../test/resources/teapot.obj", mesh);
+
+    EXPECT_EQ(mesh.vn.n_cols, mesh.v.n_cols);
+    EXPECT_EQ(mesh.vn.n_rows, mesh.v.n_rows);
+    EXPECT_EQ(mesh.f.n_rows, mesh.v.n_rows);
+}

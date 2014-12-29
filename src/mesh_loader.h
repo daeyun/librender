@@ -1,12 +1,10 @@
-#ifndef MESH_LOADER_H_
-#define MESH_LOADER_H_
+#pragma once
 
 #include <armadillo>
 #include "tiny_obj_loader.h"
-#include "mesh.h"
+#include "scry_object.h"
 
-void load_obj(const std::string obj_file, Mesh& mesh);
+void load_obj(const std::string obj_file, ScryObject& mesh);
 void compute_normals(const arma::fmat& v, const arma::umat& f, arma::fmat& vn);
 void normalize_coords(arma::fmat& v);
-
-#endif  // MESH_LOADER_H_
+void cross_col(const arma::fmat& a, const arma::fmat& b, arma::fmat& c);
