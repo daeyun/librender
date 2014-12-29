@@ -37,38 +37,16 @@ if(GIT_FOUND)
     add_definitions(-DVERSION=\"${VERSION_STRING}\")
 endif()
 
-
-
-
-
-
-
-
-
-
 # Used by both src and test
 include_directories(${SCRY_SOURCE_DIR}/src)
 include_directories(${SCRY_SOURCE_DIR}/src/third_party/tinyobjloader)
 include_directories(${GLEW_INCLUDE_DIRS})
 
-
-
-
-
-
-
-
-
 add_subdirectory(src)
 
 if (test)
-
-    message(AAAAAAAAAAAAAAAAAAAA)
-
-
     # This adds 'project(gmock)'
     add_subdirectory(${SCRY_SOURCE_DIR}/lib/gmock-1.7.0)
-
     add_subdirectory(test)
 
     enable_testing()
