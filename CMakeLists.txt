@@ -2,13 +2,13 @@ cmake_minimum_required(VERSION 2.8.4)
 
 # Set -Dtest=ON to build unit tests.
 option(test "Build all tests." OFF)
+option(debug "Debug mode." OFF)
 
 project(SCRY)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 find_package(OpenGL REQUIRED)
-find_package(GLUT REQUIRED)
 find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
 find_package(YamlCpp REQUIRED)
 find_package(Armadillo REQUIRED)
@@ -18,10 +18,14 @@ find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
 
 
-set(CORELIBS ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${ARMADILLO_LIBRARIES} ${Boost_LIBRARIES} ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${YAMLCPP_LIBRARY})
+set(CORELIBS ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${ARMADILLO_LIBRARIES} ${Boost_LIBRARIES} ${OPENGL_LIBRARY} ${YAMLCPP_LIBRARY})
 set(INCLUDE_DIRS ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 
-set(CMAKE_CXX_FLAGS "-g -Wall")
+if (debug)
+    set(CMAKE_CXX_FLAGS "-g -Wall")
+else()
+    set(CMAKE_CXX_FLAGS "-Ofast")
+endif()
 
 add_definitions(-std=c++11)
 
