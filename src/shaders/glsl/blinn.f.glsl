@@ -19,39 +19,36 @@ uniform vec3 EyeDirection;
 uniform float Shininess;
 uniform float Strength;
 uniform LightProperties Lights[NumMaxLights];
+uniform mat4 MVMatrix;
 
 // Interpolated values
 in vec4 Color;
 in vec3 Normal;
 in vec4 Position;
-in vec3 LightPositions[NumMaxLights];
 
 out vec4 FragColor;
 
 void main() {
     vec3 normal = normalize(Normal);
-
-    vec3 ambientSum = vec3(0, 0, 0);
-    vec3 diffuseSum = vec3(0, 0, 0);
-    vec3 specularSum = vec3(0, 0, 0);
+    vec4 col = vec4(0, 0, 0, 1);
 
     for (int lightIndex = 0; lightIndex < NumLights; lightIndex++) {
         if (!Lights[lightIndex].isEnabled) {
             continue;
         }
 
-        vec3 lightDir = LightPositions[lightIndex] - vec3(Position);
-        float lightDist = length(lightDir);
+        vec3 lightDir = (MVMatrix * vec4(Lights[lightIndex].LightPosition, 1)).xyz - vec3(Position);
+        float lightDistance = length(lightDir);
 
-        lightDir = lightDir / lightDist;
+        lightDir = lightDir / lightDistance;
 
         float lambertian = max(dot(lightDir, normal), 0.0);
         float specular = 0.0;
 
         float attenuation = 1.0 /
             (Lights[lightIndex].ConstantAttenuation +
-             Lights[lightIndex].LinearAttenuation * lightDist +
-             Lights[lightIndex].QuadraticAttenuation * lightDist * lightDist);
+             Lights[lightIndex].LinearAttenuation * lightDistance +
+             Lights[lightIndex].QuadraticAttenuation * lightDistance * lightDistance);
 
         if(lambertian > 0.0) {
             vec3 halfDir = normalize(lightDir + EyeDirection);
@@ -59,10 +56,9 @@ void main() {
             specular = pow(specAngle, Shininess) * Strength;
         }
 
-        ambientSum += Lights[lightIndex].Ambient;
-        diffuseSum += lambertian * vec3(Color) * attenuation;
-        specularSum += specular * Lights[lightIndex].LightColor * attenuation;
+        col += vec4(Lights[lightIndex].Ambient * attenuation +
+                lambertian * vec3(Color) * attenuation +
+                specular * Lights[lightIndex].LightColor * attenuation, 1.0);
     }
-
-    FragColor = vec4(ambientSum + diffuseSum + specularSum, 1.0);
+    FragColor = col;
 }
