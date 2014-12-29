@@ -19,7 +19,6 @@ uniform vec3 EyeDirection;
 uniform float Shininess;
 uniform float Strength;
 uniform LightProperties Lights[NumMaxLights];
-uniform mat4 MVMatrix;
 
 // Interpolated values
 in vec4 Color;
@@ -37,7 +36,7 @@ void main() {
             continue;
         }
 
-        vec3 lightDir = (MVMatrix * vec4(Lights[lightIndex].LightPosition, 1)).xyz - vec3(Position);
+        vec3 lightDir = Lights[lightIndex].LightPosition - vec3(Position);
         float lightDistance = length(lightDir);
 
         lightDir = lightDir / lightDistance;
@@ -56,9 +55,9 @@ void main() {
             specular = pow(specAngle, Shininess) * Strength;
         }
 
-        col += vec4(Lights[lightIndex].Ambient * attenuation +
+        col += vec4(mix(Lights[lightIndex].Ambient, vec3(Color), 0.35) * attenuation +
                 lambertian * vec3(Color) * attenuation +
-                specular * Lights[lightIndex].LightColor * attenuation, 1.0);
+                specular * mix(Lights[lightIndex].LightColor, vec3(Color), 0.35) * attenuation, 1.0);
     }
     FragColor = col;
 }

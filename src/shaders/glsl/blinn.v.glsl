@@ -9,14 +9,13 @@ uniform mat4 MVPMatrix;
 uniform mat4 MVMatrix;
 uniform mat4 NormalMatrix;
 
-// now need the transform, minus perspective
 out vec4 Color;
 out vec3 Normal;
-out vec4 Position; // adding position, so we know where we are
+out vec4 Position;
 
 void main() {
     Color = VertexColor;
-    Normal = normalize(NormalMatrix * vec4(VertexNormal, 1)).xyz;
-    Position = MVMatrix * vec4(VertexPosition, 1);     // pre-perspective space
-    gl_Position = MVPMatrix * vec4(VertexPosition, 1); // includes perspective
+    Normal = VertexNormal;
+    Position = vec4(VertexPosition, 1);
+    gl_Position = MVPMatrix * vec4(VertexPosition, 1);
 }
