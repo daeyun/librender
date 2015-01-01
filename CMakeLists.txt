@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.4)
 
-# Set -Dtest=ON to build unit tests.
-option(test "Build all tests." OFF)
-option(debug "Debug mode." OFF)
+# Set -DTEST=ON to build unit tests.
+option(TEST "Build all tests." OFF)
+option(DEBUG "Debug mode." OFF)
 
 project(SCRY)
 
@@ -21,7 +21,7 @@ pkg_search_module(GLFW REQUIRED glfw3)
 set(CORELIBS ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${ARMADILLO_LIBRARIES} ${Boost_LIBRARIES} ${OPENGL_LIBRARY} ${YAMLCPP_LIBRARY})
 set(INCLUDE_DIRS ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 
-if (debug)
+if (DEBUG)
     set(CMAKE_CXX_FLAGS "-g -Wall")
 else()
     set(CMAKE_CXX_FLAGS "-Ofast")
@@ -48,7 +48,7 @@ include_directories(${GLEW_INCLUDE_DIRS})
 
 add_subdirectory(src)
 
-if (test)
+if (TEST)
     # This adds 'project(gmock)'
     add_subdirectory(${SCRY_SOURCE_DIR}/lib/gmock-1.7.0)
     add_subdirectory(test)
