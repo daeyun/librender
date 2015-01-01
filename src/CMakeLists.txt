@@ -1,4 +1,8 @@
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCRY_SOURCE_DIR}/bin)
+if (DEBUG OR TEST)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCRY_SOURCE_DIR}/bin-dev)
+else()
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCRY_SOURCE_DIR}/bin)
+endif()
 
 # Get all files except for ./src/main.cc and make them a library.
 file(GLOB_RECURSE INCLUDES "*.h" "*.cpp" "*.cc")
