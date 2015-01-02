@@ -23,6 +23,7 @@ set(INCLUDE_DIRS ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 
 if (DEBUG)
     set(CMAKE_CXX_FLAGS "-g -Wall")
+    add_definitions(-DDEBUG)
 else()
     set(CMAKE_CXX_FLAGS "-Ofast")
 endif()
