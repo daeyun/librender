@@ -1,10 +1,20 @@
+/**
+ * @file mesh_loader.h
+ * @author Daeyun Shin <daeyun@dshin.org>
+ * @version 0.1
+ * @date 2015-01-02
+ * @copyright Scry is free software released under the BSD 2-Clause license.
+ */
 #pragma once
 
 #include <armadillo>
 #include "tiny_obj_loader.h"
-#include "scry_object.h"
+#include "shape.h"
 
-void load_obj(const std::string obj_file, ScryObject& mesh);
-void compute_normals(const arma::fmat& v, const arma::umat& f, arma::fmat& vn);
-void normalize_coords(arma::fmat& v);
-void cross_col(const arma::fmat& a, const arma::fmat& b, arma::fmat& c);
+namespace scry {
+
+void LoadObj(const std::string& obj_file, Shape& mesh);
+void ComputeNormals(const arma::fmat& v, const arma::umat& f, arma::fmat& vn);
+void NormalizeCoords(arma::fmat& v);
+void CrossCol(const arma::fmat& a, const arma::fmat& b, arma::fmat& c);
+}

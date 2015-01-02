@@ -1,3 +1,10 @@
+/**
+ * @file debug.h
+ * @author Daeyun Shin <daeyun@dshin.org>
+ * @version 0.1
+ * @date 2015-01-02
+ * @copyright Scry is free software released under the BSD 2-Clause license.
+ */
 #pragma once
 #ifndef DEBUG_H_
 #define DEBUG_H_
@@ -6,6 +13,8 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <sstream>
+#include <iostream>
 
 #define __COLOR_RESET "\033[0m"
 #define _COLOR_NORMAL(str) "\x1B[0m" str __COLOR_RESET
@@ -23,13 +32,12 @@
     val_str << name;                                                  \
     DisplayVariable(#name, val_str.str(), sizeof(name), (void*)&name, \
                     __FILE__, __LINE__, __func__);                    \
-    __check_errno();                                                  \
   }
 
 #define _assert(expr)                                                       \
   if (!(expr)) {                                                            \
-    fprintf(stderr, _COLOR_RED("[ERROR] (%s:%d %s) assertion %s failed\n)", \
-          __FILE__, __LINE__, __func__, #expr);                             \
+    fprintf(stderr, _COLOR_RED("[ERROR] (%s:%d %s) assertion %s failed\n"), \
+            __FILE__, __LINE__, __func__, #expr);                           \
   }                                                                         \
   __check_errno()
 
@@ -46,8 +54,9 @@
     fprintf(stderr, _COLOR_RED("[ERROR] errno: %s\n"), strerror(errno)); \
   }
 
-void DisplayVariable(std::string name, std::string value, size_t size,
-                     void* ptr, std::string file, int line, std::string func) {
+static void DisplayVariable(std::string name, std::string value, size_t size,
+                            void* ptr, std::string file, int line,
+                            std::string func) {
   fprintf(stderr,
           "[INFO]  (%s:%d %s) " _COLOR_MAGENTA("%s=%s") "  &%s=%p  %d\n",
           file.c_str(), line, func.c_str(), name.c_str(), value.c_str(),
@@ -56,15 +65,15 @@ void DisplayVariable(std::string name, std::string value, size_t size,
 
 extern char** environ;
 
-#undef __COLOR_RESET
-#undef _COLOR_NORMAL
-#undef _COLOR_RED
-#undef _COLOR_GREEN
-#undef _COLOR_YELLOW
-#undef _COLOR_BLUE
-#undef _COLOR_MAGENTA
-#undef _COLOR_CYAN
-#undef _COLOR_WHITE
+//#undef __COLOR_RESET
+//#undef _COLOR_NORMAL
+//#undef _COLOR_RED
+//#undef _COLOR_GREEN
+//#undef _COLOR_YELLOW
+//#undef _COLOR_BLUE
+//#undef _COLOR_MAGENTA
+//#undef _COLOR_CYAN
+//#undef _COLOR_WHITE
 #else  // End of #if defined(DEBUG)
 
 #define _var(name)

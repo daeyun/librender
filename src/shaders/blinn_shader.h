@@ -2,18 +2,19 @@
 #include <string>
 #include "shader_source.h"
 
-static ShaderSource kBlinnShader = {
+// Generated from blinn.v.glsl and blinn.f.glsl on 2015-01-02
+static const ShaderSource kBlinnShader = {
 "#version 330 core\n"
 "layout(location = 0) in vec3 VertexPosition;"
 "layout(location = 1) in vec3 VertexNormal;"
 "layout(location = 2) in vec4 VertexColor;"
 "layout(location = 3) in vec2 VertexTexCoord;"
-"uniform mat4 MVPMatrix;"
-"uniform mat4 MVMatrix;"
-"uniform mat4 NormalMatrix;"
 "out vec4 Color;"
 "out vec3 Normal;"
 "out vec4 Position;"
+"uniform mat4 MVPMatrix;"
+"uniform mat4 MVMatrix;"
+"uniform mat4 NormalMatrix;"
 "void main() {"
 "    Color = VertexColor;"
 "    Normal = VertexNormal;"

@@ -1,3 +1,11 @@
+/**
+ * @file blinn.f.glsl
+ * @brief Shader based on the Blinn-Phong model.
+ * @author Daeyun Shin <daeyun@dshin.org>
+ * @version 0.1
+ * @date 2015-01-02
+ * @copyright Scry is free software under the BSD 2-Clause license.
+ */
 #version 330 core
 
 struct LightProperties {

@@ -1,124 +1,199 @@
+/**
+ * @file graphics.cc
+ * @author Daeyun Shin <daeyun@dshin.org>
+ * @version 0.1
+ * @date 2015-01-02
+ * @copyright Scry is free software released under the BSD 2-Clause license.
+ */
 #include "graphics.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <vector>
+#include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 #include "shader.h"
-#include "controls.h"
-#include "scry_object.h"
+#include "shape.h"
 #include "annotation.h"
 #include "shader.h"
 #include "shaders/blinn_shader.h"
-#include "gl_object.h"
+#include "shader_object.h"
 #include "config.h"
+#include "framebuffer.h"
+#include "io.h"
+#include "gui.h"
 
-GLFWwindow* window;
+namespace scry {
 
-using namespace glm;
+/**
+ * @brief
+ *
+ * @param object
+ * @param filename
+ */
+void Render(const Shape& object, const std::string& filename) {
+  bool is_off_screen = true;
+  if (filename.empty()) {
+    is_off_screen = false;
+  }
 
-int render_object(const ScryObject& mesh) {
-    // Initialise GLFW
-    if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
-        return -1;
-    }
+  int window_width, window_height;
+  if (is_off_screen) {
+    // Invisible window
+    window_width = 0;
+    window_height = 0;
+  } else {
+    window_width = config::image_width;
+    window_height = config::image_height;
+  }
 
-    // 4x antialiasing
-    glfwWindowHint(GLFW_SAMPLES, 4);
+  gui::CreateWindow(window_width, window_height, config::window_title);
 
-    // OpenGL 3.3
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  // Support experimental drivers
+  glewExperimental = true;
+  GLenum glew_error = glewInit();
+  if (glew_error != GLEW_OK) {
+    std::cerr << glewGetErrorString(glew_error) << std::endl;
+    throw std::runtime_error("Failed to open GLEW.");
+  }
 
-    // for OS X
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  Framebuffer* framebuffer;
+  if (is_off_screen) {
+    framebuffer = new Framebuffer(config::image_width, config::image_height,
+                                  config::num_msaa_samples);
+    framebuffer->Bind();
+    // Required for the new framebuffer object.
+    glViewport(0, 0, config::image_width, config::image_height);
+    glEnable(GL_MULTISAMPLE);
+  }
 
-    // Open a window and create its OpenGL context
-    window = glfwCreateWindow(config::window_width, config::window_height,
-                              config::window_title.c_str(), NULL, NULL);
-    if (window == NULL) {
-        std::cerr << "Failed to open GLFW window." << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
+  glm::vec4 bg = config::background;
+  glClearColor(bg.r, bg.g, bg.b, bg.a);
 
-    glewExperimental = true;
-    if (glewInit() != GLEW_OK) {
-        std::cerr << "Failed to open GLEW." << std::endl;
-        return -1;
-    }
+  // Enable depth test.
+  glEnable(GL_DEPTH_TEST);
 
-    // Ensure we can capture the escape key being pressed below
-    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+  // Accept fragment if it closer to the camera than the former one.
+  glDepthFunc(GL_LESS);
 
-    //glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-    auto bg = config::background;
-    glClearColor(bg.r, bg.g, bg.b, bg.a);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Enable depth test
-    glEnable(GL_DEPTH_TEST);
-    // Accept fragment if it closer to the camera than the former one
-    glDepthFunc(GL_LESS);
+  CameraParams cam_params;
+  cam_params.target = config::target;
+  cam_params.up_ang = config::up_ang;
+  cam_params.el = config::el;
+  cam_params.az = config::az;
+  cam_params.r = config::r;
 
-    // Cull triangles which normal is not towards the camera
-    //glEnable(GL_CULL_FACE);
+  ShaderViewParams view_params;
 
-    std::vector<LightProperties> lights;
-    LightProperties light;
-    light.light_position = config::light_position;
-    light.ambient = config::ambient;
-    light.constant_attenuation = config::constant_attenuation;
-    light.linear_attenuation = config::linear_attenuation;
-    light.quadratic_attenuation = config::quadratic_attenuation;
-    lights.push_back(light);
+  ComputeMatrices(cam_params, view_params);
 
-    ShaderProperties shader_properties;
-    shader_properties.lights = lights;
-    shader_properties.shininess = config::shininess;
-    shader_properties.strength = config::strength;
+  ShaderProperties shader_properties;
+  InitializeShader(shader_properties);
 
-    GLuint shader_id = Shader::Shader(kBlinnShader);
+  GLuint shader_id = shader::Shader(kBlinnShader);
 
-    GLObject object(&mesh, shader_id, NULL);
-    Annotation annotation(arma::min(mesh.v.row(2)));
+  ShaderObject drawable_object(&object, shader_id, NULL);
 
-    do {
-        // Compute the MVP matrix from keyboard and mouse input
-        if (computeMatricesFromInputs()) {
-            glm::mat4 projection = getProjectionMatrix();
-            glm::mat4 view = getViewMatrix();
-            glm::mat4 model = glm::mat4(1.0);
-            glm::vec3 eye_dir = getEyeDirection();
+  float min_z = arma::min(object.v.row(2));
+  Annotation annotation(min_z);
 
-            shader_properties.mv = view * model;
-            shader_properties.mvp = projection * shader_properties.mv;
-            shader_properties.eye_direction = eye_dir;
-            shader_properties.normal_mat = glm::transpose(glm::inverse(shader_properties.mv));
+  UpdateShaderView(view_params, shader_properties);
 
-            // Clear the screen
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  annotation.draw(view_params.projection_mat, view_params.view_mat,
+                  view_params.model_mat);
+  drawable_object.draw(shader_properties);
 
-            annotation.draw(projection, view, model);
-            object.draw(shader_properties);
-        }
+  if (is_off_screen) {
+    // Read pixel values from the framebuffer.
+    size_t buffer_size = framebuffer->Size();
+    uint8_t* pixels = (uint8_t*)malloc(buffer_size);
+    framebuffer->ReadPixels(pixels);
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }  // Check if the ESC key was pressed or the window was closed
-    while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-           glfwWindowShouldClose(window) == 0);
+    io::SaveAsPNG(filename, pixels, config::image_width, config::image_height);
+    free(pixels);
+    framebuffer->Unbind();
 
-    glDeleteProgram(shader_id);
+    delete framebuffer;
+  }
 
-    // Close OpenGL window and terminate GLFW
-    glfwTerminate();
+  glDeleteProgram(shader_id);
+}
 
-    return 0;
+/**
+ * @brief
+ *
+ * @param[in] view_params
+ * @param[out] shader_properties
+ */
+void UpdateShaderView(const ShaderViewParams& view_params,
+                      ShaderProperties& shader_properties) {
+  shader_properties.mv = view_params.view_mat * view_params.model_mat;
+  shader_properties.mvp = view_params.projection_mat * shader_properties.mv;
+  shader_properties.eye_direction = view_params.eye_direction;
+  shader_properties.normal_mat =
+      glm::transpose(glm::inverse(shader_properties.mv));
+}
+
+/**
+ * @brief
+ *
+ * @param shader_properties
+ */
+void InitializeShader(ShaderProperties& shader_properties) {
+  std::vector<LightProperties> lights;
+  LightProperties light;
+  light.light_position = config::light_position;
+  light.ambient = config::ambient;
+  light.constant_attenuation = config::constant_attenuation;
+  light.linear_attenuation = config::linear_attenuation;
+  light.quadratic_attenuation = config::quadratic_attenuation;
+  lights.push_back(light);
+
+  shader_properties.lights = lights;
+  shader_properties.shininess = config::shininess;
+  shader_properties.strength = config::strength;
+}
+
+/**
+ * @brief Rotate a vector around an axis.
+ *
+ * @param[in] axis Axis vector to rotate around.
+ * @param[in] angle Angle in radians.
+ * @param[out] vector Vector to rotate.
+ */
+void RotateVector(const glm::vec3& axis, const float angle, glm::vec3& vector) {
+  vector = glm::vec3(glm::rotate(angle, axis) * glm::vec4(vector, 1));
+}
+
+/**
+ * @brief
+ *
+ * @param params
+ * @param output
+ */
+void ComputeMatrices(const CameraParams& params, ShaderViewParams& output) {
+  float fov = glm::radians(config::fov);
+
+  glm::vec3 position = glm::vec3(params.r * sin(params.el) * cos(params.az),
+                                 params.r * sin(params.el) * sin(params.az),
+                                 params.r * cos(params.el));
+
+  glm::vec3 up = glm::vec3(sin(params.el - kPi / 2) * cos(params.az),
+                           sin(params.el - kPi / 2) * sin(params.az),
+                           cos(params.el - kPi / 2));
+
+  glm::vec3 lookat = glm::normalize(params.target - position);
+  RotateVector(lookat, params.up_ang, up);
+
+  output.projection_mat =
+      glm::perspective(fov, ((float)config::image_width) / config::image_height,
+                       config::near, config::far);
+  output.view_mat = glm::lookAt(position, position + lookat, up);
+  output.model_mat = glm::mat4(1.0);
+  output.eye_direction = -lookat;
+}
 }
