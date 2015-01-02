@@ -1,5 +1,7 @@
 /build
 /bin
+/bin-dev
+/build-dev
 /.ycm_extra_conf.*
 .ropeproject
 
