@@ -78,7 +78,7 @@ void InitWindowControls(GLFWwindow* window) {
 
 void KeyEventHandler(GLFWwindow* window, int key, int scancode, int action,
                      int mods) {
-  _var(camera_params) if (action & (GLFW_PRESS | GLFW_REPEAT)) switch (key) {
+  if (action & (GLFW_PRESS | GLFW_REPEAT)) switch (key) {
     case GLFW_KEY_UP:
       if (mods & GLFW_MOD_SHIFT)
         camera_params->r += 0.1;

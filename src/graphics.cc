@@ -31,7 +31,6 @@ extern CameraParams* gui::camera_params;
 
 /**
  * @brief
- *
  * @param object
  * @param filename
  */
@@ -135,7 +134,6 @@ void Render(const Shape& object, const std::string& filename) {
 
 /**
  * @brief
- *
  * @param[in] view_params
  * @param[out] shader_properties
  */
@@ -150,7 +148,6 @@ void UpdateShaderView(const ShaderViewParams& view_params,
 
 /**
  * @brief
- *
  * @param shader_properties
  */
 void InitializeShader(ShaderProperties& shader_properties) {
@@ -170,7 +167,6 @@ void InitializeShader(ShaderProperties& shader_properties) {
 
 /**
  * @brief Rotate a vector around an axis.
- *
  * @param[in] axis Axis vector to rotate around.
  * @param[in] angle Angle in radians.
  * @param[out] vector Vector to rotate.
@@ -181,7 +177,6 @@ void RotateVector(const glm::vec3& axis, const float angle, glm::vec3& vector) {
 
 /**
  * @brief
- *
  * @param params
  * @param output
  */

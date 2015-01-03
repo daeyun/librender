@@ -25,9 +25,10 @@
 
 int main(int argc, char* argv[]) {
   scry::config::InitFromMainArgs(argc, argv);
-  scry::Shape mesh;
 
-  scry::LoadObj(scry::config::mesh_files[0], mesh);
-
-  scry::Render(mesh, scry::config::outfile);
+  for (auto mesh_file : scry::config::mesh_files) {
+    scry::Shape mesh;
+    scry::LoadObj(mesh_file, mesh);
+    scry::Render(mesh, scry::config::outfile);
+  }
 }
