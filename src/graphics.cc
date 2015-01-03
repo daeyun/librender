@@ -27,6 +27,8 @@
 
 namespace scry {
 
+extern CameraParams* gui::camera_params;
+
 /**
  * @brief
  *
@@ -49,7 +51,8 @@ void Render(const Shape& object, const std::string& filename) {
     window_height = config::image_height;
   }
 
-  gui::CreateWindow(window_width, window_height, config::window_title);
+  GLFWwindow* window =
+      gui::CreateWindow(window_width, window_height, config::window_title);
 
   // Support experimental drivers
   glewExperimental = true;
@@ -78,8 +81,6 @@ void Render(const Shape& object, const std::string& filename) {
   // Accept fragment if it closer to the camera than the former one.
   glDepthFunc(GL_LESS);
 
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
   CameraParams cam_params;
   cam_params.target = config::target;
   cam_params.up_ang = config::up_ang;
@@ -87,9 +88,9 @@ void Render(const Shape& object, const std::string& filename) {
   cam_params.az = config::az;
   cam_params.r = config::r;
 
-  ShaderViewParams view_params;
+  gui::camera_params = &cam_params;
 
-  ComputeMatrices(cam_params, view_params);
+  ShaderViewParams view_params;
 
   ShaderProperties shader_properties;
   InitializeShader(shader_properties);
@@ -101,11 +102,19 @@ void Render(const Shape& object, const std::string& filename) {
   float min_z = arma::min(object.v.row(2));
   Annotation annotation(min_z);
 
-  UpdateShaderView(view_params, shader_properties);
+  do {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    ComputeMatrices(cam_params, view_params);
 
-  annotation.draw(view_params.projection_mat, view_params.view_mat,
-                  view_params.model_mat);
-  drawable_object.draw(shader_properties);
+    UpdateShaderView(view_params, shader_properties);
+
+    annotation.draw(view_params.projection_mat, view_params.view_mat,
+                    view_params.model_mat);
+    drawable_object.draw(shader_properties);
+
+    glfwSwapBuffers(window);
+    glfwWaitEvents();
+  } while (!is_off_screen && !glfwWindowShouldClose(window));
 
   if (is_off_screen) {
     // Read pixel values from the framebuffer.
@@ -121,6 +130,7 @@ void Render(const Shape& object, const std::string& filename) {
   }
 
   glDeleteProgram(shader_id);
+  glfwTerminate();
 }
 
 /**

@@ -16,27 +16,22 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <condition_variable>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/constants.hpp>
 #include "config.h"
+#include "graphics.h"
 
 namespace scry {
 namespace gui {
 
-void Initialize() {
-  if (!is_initialized) {
-    is_initialized = true;
-    std::thread update_thread(UpdateWindowThread);
-  }
-}
+CameraParams* camera_params;
 
 /**
  * @brief Create a GLFW window. Invisible if width or height is 0.
- *
  * @param width Window width in pixels.
  * @param height Window height in pixels.
  * @param title Title of the window.
- *
  * @return Pointer to the created GLFW window.
  */
 GLFWwindow* CreateWindow(int width, int height, const std::string& title) {
@@ -77,112 +72,42 @@ GLFWwindow* CreateWindow(int width, int height, const std::string& title) {
   return window;
 }
 
-void UpdateWindowThread() {
-  // draw
-
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000 / fps));
-}
-
 void InitWindowControls(GLFWwindow* window) {
-  // keys_pressed.insert(window, std::set<Key>());
-  // glfwSetKeyCallback(window, KeyEventHandler);
+  glfwSetKeyCallback(window, KeyEventHandler);
 }
 
 void KeyEventHandler(GLFWwindow* window, int key, int scancode, int action,
                      int mods) {
-  Key scry_key;
-
-  switch (key) {
+  _var(camera_params) if (action & (GLFW_PRESS | GLFW_REPEAT)) switch (key) {
     case GLFW_KEY_UP:
-      scry_key = UP;
+      if (mods & GLFW_MOD_SHIFT)
+        camera_params->r += 0.1;
+      else
+        camera_params->el += 0.1;
       break;
     case GLFW_KEY_DOWN:
-      scry_key = DOWN;
+      if (mods & GLFW_MOD_SHIFT)
+        camera_params->r -= 0.1;
+      else
+        camera_params->el -= 0.1;
       break;
     case GLFW_KEY_LEFT:
-      scry_key = LEFT;
+      if (mods & GLFW_MOD_SHIFT)
+        camera_params->up_ang -= 0.1;
+      else
+        camera_params->az -= 0.1;
       break;
     case GLFW_KEY_RIGHT:
-      scry_key = RIGHT;
+      if (mods & GLFW_MOD_SHIFT)
+        camera_params->up_ang += 0.1;
+      else
+        camera_params->az += 0.1;
       break;
-    case GLFW_KEY_LEFT_SHIFT:
-      scry_key = SHIFT;
-      break;
-    case GLFW_KEY_LEFT_CONTROL:
-      scry_key = CONTROL;
-      break;
-    case GLFW_KEY_LEFT_ALT:
-      scry_key = ALT;
-      break;
+    case GLFW_KEY_ESCAPE:
+      glfwSetWindowShouldClose(window, GL_TRUE);
     default:
       return;
   }
-
-  // keys_pressed_mutex.lock();
-  // try {
-  //  switch (action) {
-  //    case GLFW_PRESS:
-  //      keys_pressed[window].insert(scry_key);
-  //      break;
-  //    case GLFW_RELEASE:
-  //      keys_pressed[window].erase(scry_key);
-  //      break;
-  //    default:
-  //      break;
-  //  }
-  //} catch (...) {
-  //}
-  // keys_pressed_mutex.unlock();
 }
-
-// float control_speed = config::window_control_speed;
-//
-// bool UpdateCameraParamsFromInput(GLFWwindow* window, CameraParams params) {
-//  static double lastTime = glfwGetTime();
-//
-//  double currentTime = glfwGetTime();
-//  float deltaTime = float(currentTime - lastTime);
-//
-//  float delta = deltaTime * control_speed;
-//  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-//    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-//      params.r += delta;
-//      did_change = true;
-//    } else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-//      params.r -= delta;
-//      did_change = true;
-//    }
-//
-//    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-//      params.up_ang += delta;
-//      did_change = true;
-//    } else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-//      params.up_ang -= delta;
-//      did_change = true;
-//    }
-//  } else {
-//    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-//      params.el += delta;
-//      did_change = true;
-//    } else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-//      params.el -= delta;
-//      did_change = true;
-//    }
-//
-//    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-//      params.az += delta;
-//      did_change = true;
-//    } else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-//      params.az -= delta;
-//      did_change = true;
-//    }
-//  }
-//
-//  lastTime = currentTime;
-//  if (!did_change) return false;
-//
-//  did_change = false;
-//  return true;
-//}
 }
 }

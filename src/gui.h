@@ -12,11 +12,10 @@
 #include <unordered_map>
 #include <set>
 #include <mutex>
+#include "graphics.h"
 
 namespace scry {
 namespace gui {
-
-enum Key { SHIFT, CONTROL, ALT, UP, DOWN, LEFT, RIGHT };
 
 void Initialize();
 GLFWwindow* CreateWindow(int width, int height, const std::string& title);
@@ -25,10 +24,6 @@ void InitWindowControls(GLFWwindow* window);
 void KeyEventHandler(GLFWwindow* window, int key, int scancode, int action,
                      int mods);
 
-static std::unordered_map<GLFWwindow*, std::set<Key>> keys_pressed;
-static std::mutex keys_pressed_mutex;
-
-static int fps = 30;
-static bool is_initialized = false;
+extern CameraParams* camera_params;
 }
 }
