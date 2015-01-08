@@ -13,6 +13,7 @@
 #include "shape.h"
 #include "databuffer.h"
 #include "shader.h"
+#include "graphics.h"
 
 namespace scry {
 
@@ -23,7 +24,7 @@ class ShaderObject {
                const char* texture_filename);
   void clean();
 
-  void draw(const ShaderProperties& shader_properties);
+  void draw(const RenderParams& render_params);
   const Shape* shape;
 
   GLuint vertex_array_id;

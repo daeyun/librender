@@ -7,25 +7,16 @@
  */
 #include "io.h"
 
-#include <sstream>
 #include <iomanip>
 #include <pwd.h>
-#include <unistd.h>
-#include <algorithm>
 #include <random>
-#include <stdexcept>
-#include <chrono>
-#include <sys/types.h>
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
-#include <boost/predef.h>
 #include "third_party/lodepng/lodepng.h"
 #include "config.h"
 
-namespace scry {
-namespace io {
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
+namespace scry {
+namespace io {
 
 /**
  * @brief Cross-platform user directory. Check $HOME first on all platforms.
@@ -79,8 +70,10 @@ std::string ExpandUserPath(std::string path) {
  * @param path Relative or absolute path containing ~, .. and .
  * @return Absolute path
  */
-std::string FindFullPath(std::string path) {
-  return fs::canonical(ExpandUserPath(path)).string();
+std::string FindFullPath(const std::string& path, const std::string& base) {
+  if (base.empty())
+    return fs::canonical(ExpandUserPath(path)).string();
+  return fs::absolute(ExpandUserPath(path), base).string();
 }
 
 /**
@@ -95,7 +88,8 @@ std::string FindFullPath(std::string path) {
  */
 std::string AppendToFilename(const std::string& path, const std::string& str) {
   fs::path p(path);
-  fs::path dir = p.remove_filename();
+  fs::path dir = p;
+  dir.remove_filename();
   std::string rawname = p.stem().string();
   // ext includes the dot (e.g. ".png"); empty if not found.
   std::string ext = p.extension().string();
@@ -225,6 +219,8 @@ bool ResolveFilenameConflict(std::string& filename, int max_num,
 void SaveAsPNG(std::string filename, const uint8_t* data, int w, int h,
                bool allow_overwrite) {
   if (!allow_overwrite) ResolveFilenameConflict(filename);
+  fs::create_directories(fs::path(filename).parent_path());
+  if (config::is_verbose) std::cout << "Saving as " << filename << std::endl;
   lodepng::encode(filename, data, w, h);
 }
 

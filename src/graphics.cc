@@ -27,16 +27,46 @@
 
 namespace scry {
 
-extern CameraParams* gui::camera_params;
+RenderParams::RenderParams() {
+  // Default values
+  target = glm::vec3(0, 0, 0);
+  fov = 60;
+
+  up_axis = Y;
+  will_normalize = true;
+  are_axes_visible = false;
+  background = glm::vec4(1, 1, 1, 1);
+
+  shader_params.ambient = glm::vec3(0.2, 0.2, 0.2);
+  shader_params.shininess = 20;
+  shader_params.strength = 1;
+
+  up_angle = 0;
+  el = 1;
+  az = 1;
+  r = 1.5;
+
+  near = 0.1;
+  far = 100;
+
+  image_width = 800;
+  image_height = 600;
+  can_overwrite = false;
+
+  num_msaa_samples = 4;
+
+  color = arma::fvec({1, 0, 0, 1});
+  is_color_forced = false;
+}
 
 /**
  * @brief
  * @param object
  * @param filename
  */
-void Render(const Shape& object, const std::string& filename) {
+void Render(const Shape& shape, RenderParams& params) {
   bool is_off_screen = true;
-  if (filename.empty()) {
+  if (params.out_filename.empty()) {
     is_off_screen = false;
   }
 
@@ -45,13 +75,14 @@ void Render(const Shape& object, const std::string& filename) {
     // Invisible window
     window_width = 0;
     window_height = 0;
+
   } else {
-    window_width = config::image_width;
-    window_height = config::image_height;
+    window_width = params.image_width;
+    window_height = params.image_height;
   }
 
-  GLFWwindow* window =
-      gui::CreateWindow(window_width, window_height, config::window_title);
+  GLFWwindow* window = gui::CreateWindow(window_width, window_height,
+                                         config::window_title, params);
 
   // Support experimental drivers
   glewExperimental = true;
@@ -63,15 +94,15 @@ void Render(const Shape& object, const std::string& filename) {
 
   Framebuffer* framebuffer;
   if (is_off_screen) {
-    framebuffer = new Framebuffer(config::image_width, config::image_height,
-                                  config::num_msaa_samples);
+    framebuffer = new Framebuffer(params.image_width, params.image_height,
+                                  params.num_msaa_samples);
     framebuffer->Bind();
     // Required for the new framebuffer object.
-    glViewport(0, 0, config::image_width, config::image_height);
+    glViewport(0, 0, params.image_width, params.image_height);
     glEnable(GL_MULTISAMPLE);
   }
 
-  glm::vec4 bg = config::background;
+  glm::vec4 bg = params.background;
   glClearColor(bg.r, bg.g, bg.b, bg.a);
 
   // Enable depth test.
@@ -80,36 +111,21 @@ void Render(const Shape& object, const std::string& filename) {
   // Accept fragment if it closer to the camera than the former one.
   glDepthFunc(GL_LESS);
 
-  CameraParams cam_params;
-  cam_params.target = config::target;
-  cam_params.up_ang = config::up_ang;
-  cam_params.el = config::el;
-  cam_params.az = config::az;
-  cam_params.r = config::r;
-
-  gui::camera_params = &cam_params;
-
-  ShaderViewParams view_params;
-
-  ShaderProperties shader_properties;
-  InitializeShader(shader_properties);
+  gui::render_params = &params;
 
   GLuint shader_id = shader::Shader(kBlinnShader);
 
-  ShaderObject drawable_object(&object, shader_id, NULL);
+  ShaderObject drawable_object(&shape, shader_id, nullptr);
 
-  float min_z = arma::min(object.v.row(2));
-  Annotation annotation(min_z);
+  float min_z = arma::min(shape.v.row(2));
+  Annotation annotation(min_z, params);
 
   do {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    ComputeMatrices(cam_params, view_params);
+    ComputeMatrices(params);
 
-    UpdateShaderView(view_params, shader_properties);
-
-    annotation.draw(view_params.projection_mat, view_params.view_mat,
-                    view_params.model_mat);
-    drawable_object.draw(shader_properties);
+    annotation.draw(params);
+    drawable_object.draw(params);
 
     glfwSwapBuffers(window);
     glfwWaitEvents();
@@ -121,7 +137,8 @@ void Render(const Shape& object, const std::string& filename) {
     uint8_t* pixels = (uint8_t*)malloc(buffer_size);
     framebuffer->ReadPixels(pixels);
 
-    io::SaveAsPNG(filename, pixels, config::image_width, config::image_height);
+    io::SaveAsPNG(params.out_filename, pixels, params.image_width,
+                  params.image_height, params.can_overwrite);
     free(pixels);
     framebuffer->Unbind();
 
@@ -133,72 +150,48 @@ void Render(const Shape& object, const std::string& filename) {
 }
 
 /**
- * @brief
- * @param[in] view_params
- * @param[out] shader_properties
- */
-void UpdateShaderView(const ShaderViewParams& view_params,
-                      ShaderProperties& shader_properties) {
-  shader_properties.mv = view_params.view_mat * view_params.model_mat;
-  shader_properties.mvp = view_params.projection_mat * shader_properties.mv;
-  shader_properties.eye_direction = view_params.eye_direction;
-  shader_properties.normal_mat =
-      glm::transpose(glm::inverse(shader_properties.mv));
-}
-
-/**
- * @brief
- * @param shader_properties
- */
-void InitializeShader(ShaderProperties& shader_properties) {
-  std::vector<LightProperties> lights;
-  LightProperties light;
-  light.light_position = config::light_position;
-  light.ambient = config::ambient;
-  light.constant_attenuation = config::constant_attenuation;
-  light.linear_attenuation = config::linear_attenuation;
-  light.quadratic_attenuation = config::quadratic_attenuation;
-  lights.push_back(light);
-
-  shader_properties.lights = lights;
-  shader_properties.shininess = config::shininess;
-  shader_properties.strength = config::strength;
-}
-
-/**
  * @brief Rotate a vector around an axis.
  * @param[in] axis Axis vector to rotate around.
- * @param[in] angle Angle in radians.
+ * @param[in] angle Angle in degrees. Internally converted to radians.
  * @param[out] vector Vector to rotate.
  */
 void RotateVector(const glm::vec3& axis, const float angle, glm::vec3& vector) {
-  vector = glm::vec3(glm::rotate(angle, axis) * glm::vec4(vector, 1));
+  vector =
+      glm::vec3(glm::rotate(glm::radians(angle), axis) * glm::vec4(vector, 1));
 }
 
 /**
  * @brief
- * @param params
- * @param output
+ * @param[in,out] render_params
  */
-void ComputeMatrices(const CameraParams& params, ShaderViewParams& output) {
-  float fov = glm::radians(config::fov);
+void ComputeMatrices(RenderParams& render_params) {
+  float fov = glm::radians(render_params.fov);
+  bool is_off_screen = !render_params.out_filename.empty();
 
-  glm::vec3 position = glm::vec3(params.r * sin(params.el) * cos(params.az),
-                                 params.r * sin(params.el) * sin(params.az),
-                                 params.r * cos(params.el));
+  glm::vec3 position =
+      glm::vec3(render_params.r * sin(render_params.el) * cos(render_params.az),
+                render_params.r * sin(render_params.el) * sin(render_params.az),
+                render_params.r * cos(render_params.el));
 
-  glm::vec3 up = glm::vec3(sin(params.el - kPi / 2) * cos(params.az),
-                           sin(params.el - kPi / 2) * sin(params.az),
-                           cos(params.el - kPi / 2));
+  glm::vec3 up =
+      glm::vec3(sin(render_params.el - kPi / 2) * cos(render_params.az),
+                sin(render_params.el - kPi / 2) * sin(render_params.az),
+                cos(render_params.el - kPi / 2));
 
-  glm::vec3 lookat = glm::normalize(params.target - position);
-  RotateVector(lookat, params.up_ang, up);
+  glm::vec3 lookat = glm::normalize(render_params.target - position);
+  RotateVector(lookat, render_params.up_angle, up);
 
-  output.projection_mat =
-      glm::perspective(fov, ((float)config::image_width) / config::image_height,
-                       config::near, config::far);
-  output.view_mat = glm::lookAt(position, position + lookat, up);
-  output.model_mat = glm::mat4(1.0);
-  output.eye_direction = -lookat;
+  render_params.shader_params.projection_mat = glm::perspective(
+      fov, ((float)render_params.image_width) / render_params.image_height,
+      render_params.near, render_params.far);
+
+  // Flip the image vertically. The pixels copied from the framebuffer
+  // object will appear straight up.
+  if (is_off_screen) render_params.shader_params.projection_mat[1] *= -1;
+
+  render_params.shader_params.view_mat =
+      glm::lookAt(position, position + lookat, up);
+  render_params.shader_params.model_mat = glm::mat4(1.0);
+  render_params.shader_params.eye_direction = -lookat;
 }
 }

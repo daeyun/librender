@@ -11,6 +11,7 @@
 #include <armadillo>
 #include <boost/format.hpp>
 #include "config.h"
+#include "graphics.h"
 #include "shape.h"
 
 namespace scry {
@@ -18,27 +19,27 @@ namespace scry {
 /**
  * @brief Import shape from a Wavefront .obj file. Vertex normals are estimated
  *        if not provided.
- * @param[in] obj_file
+ * @param[in] render_params
  * @param[out] mesh
  */
-void LoadObj(const std::string& obj_file, Shape& mesh) {
+void LoadObj(const RenderParams& render_params, Shape& mesh) {
   std::vector<tinyobj::shape_t> shapes;
   std::vector<tinyobj::material_t> materials;
 
-  std::string err = tinyobj::LoadObj(shapes, materials, obj_file.c_str());
+  std::string err = tinyobj::LoadObj(shapes, materials, render_params.in_filename.c_str());
 
   if (!err.empty()) throw std::runtime_error(err);
   if (shapes.empty())
-    throw std::runtime_error(std::string("Shape not found in ") + obj_file);
+    throw std::runtime_error(std::string("Shape not found in ") + render_params.in_filename);
 
   const int kVertexDims = 3;
   const int kTextureDims = 2;
 
   for (tinyobj::shape_t shape : shapes) {
     if (shape.mesh.positions.empty())
-      throw std::runtime_error(std::string("Vertex not found in ") + obj_file);
+      throw std::runtime_error(std::string("Vertex not found in ") + render_params.in_filename);
     if (shape.mesh.indices.empty())
-      throw std::runtime_error(std::string("Face not found in ") + obj_file);
+      throw std::runtime_error(std::string("Face not found in ") + render_params.in_filename);
 
     int kNumVertex = shape.mesh.positions.size() / kVertexDims;
     int kNumFace = shape.mesh.indices.size() / kVertexDims;
@@ -66,11 +67,11 @@ void LoadObj(const std::string& obj_file, Shape& mesh) {
 
   mesh.vn = arma::normalise(mesh.vn);
 
-  if (config::will_normalize) {
+  if (render_params.will_normalize) {
     NormalizeCoords(mesh.v);
   }
 
-  switch (config::up_axis) {
+  switch (render_params.up_axis) {
     case X:
       mesh.v = arma::join_vert(mesh.v.rows(1, 2), mesh.v.row(0));
       mesh.vn = arma::join_vert(mesh.vn.rows(1, 2), mesh.vn.row(0));
@@ -86,7 +87,7 @@ void LoadObj(const std::string& obj_file, Shape& mesh) {
 
   // RGBA color per vertex
   mesh.color.reshape(4, mesh.v.n_cols);
-  mesh.color.each_col() = config::color;
+  mesh.color.each_col() = render_params.color;
 
   mesh.type = kTriangleMesh;
 }

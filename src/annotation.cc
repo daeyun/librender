@@ -15,12 +15,13 @@
 #include "shape.h"
 #include "shader_object.h"
 #include "config.h"
+#include "graphics.h"
 
 extern GLuint scry_current_shader;
 
 namespace scry {
 
-Annotation::Annotation(float grid_z) {
+Annotation::Annotation(float grid_z, RenderParams& render_params) {
   std::vector<std::string> labels = {"x", "y", "z"};
   float length = 0.6;
   arma::fmat origin = {0, 0, 0};
@@ -28,7 +29,7 @@ Annotation::Annotation(float grid_z) {
 
   GLuint simple_shader = shader::Shader(kSimpleShader);
 
-  if (config::are_axes_visible) {
+  if (render_params.are_axes_visible) {
     this->axis_data = new Shape();
     this->axis_data->type = kLines;
     this->axis_data->v.reshape(3, 6);
@@ -48,7 +49,9 @@ Annotation::Annotation(float grid_z) {
       this->axis_data->f(1, i) = 2 * i + 1;
     }
 
-    this->gl_axes = ShaderObject(this->axis_data, simple_shader, NULL);
+    this->gl_axes = ShaderObject(this->axis_data, simple_shader, nullptr);
+  } else {
+    this->axis_data = nullptr;
   }
 
   length = 1.5;
@@ -91,11 +94,11 @@ Annotation::Annotation(float grid_z) {
     lcount++;
   }
 
-  this->gl_grid = ShaderObject(this->grid_data, simple_shader, NULL);
+  this->gl_grid = ShaderObject(this->grid_data, simple_shader, nullptr);
 }
 
 Annotation::~Annotation() {
-  if (config::are_axes_visible) {
+  if (this->axis_data != nullptr) {
     delete this->axis_data;
     this->gl_axes.clean();
   }
@@ -103,14 +106,10 @@ Annotation::~Annotation() {
   this->gl_grid.clean();
 }
 
-void Annotation::draw(const glm::mat4& projection, const glm::mat4& view,
-                      const glm::mat4& model) {
-  shader_properties.mv = view * model;
-  shader_properties.mvp = projection * shader_properties.mv;
-
-  if (config::are_axes_visible) {
-    gl_axes.draw(shader_properties);
+void Annotation::draw(const RenderParams& render_params) {
+  if (render_params.are_axes_visible) {
+    gl_axes.draw(render_params);
   }
-  gl_grid.draw(shader_properties);
+  gl_grid.draw(render_params);
 }
 }

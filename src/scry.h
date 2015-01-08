@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include "graphics.h"
 
 #ifndef VERSION
 #define VERSION "unknown version"
@@ -16,7 +17,8 @@
 namespace scry {
 namespace config {
 
-int InitFromMainArgs(int argc, char** argv);
-void InitFromFile(const std::string& filename);
+int InitFromMainArgs(int argc, char* argv[],
+                     std::vector<RenderParams>& all_params);
+void InitFromFile(const std::string& filename, RenderParams& params);
 }
 }

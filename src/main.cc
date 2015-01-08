@@ -7,28 +7,23 @@
  */
 #include "main.h"
 
-#include <sys/types.h>
-#include <unistd.h>
-#include <pwd.h>
 #include <iostream>
-#include <fstream>
-#include <string>
 #include <vector>
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
-#include "tiny_obj_loader.h"
 #include "config.h"
 #include "mesh_loader.h"
-#include "shape.h"
 #include "graphics.h"
 #include "scry.h"
 
 int main(int argc, char* argv[]) {
-  scry::config::InitFromMainArgs(argc, argv);
+  std::vector<scry::RenderParams> all_params;
+  scry::config::InitFromMainArgs(argc, argv, all_params);
 
-  for (auto mesh_file : scry::config::mesh_files) {
+  for (scry::RenderParams& params: all_params) {
+    if (scry::config::is_verbose) {
+      std::cout << params.in_filename << std::endl;
+    }
     scry::Shape mesh;
-    scry::LoadObj(mesh_file, mesh);
-    scry::Render(mesh, scry::config::outfile);
+    scry::LoadObj(params, mesh);
+    scry::Render(mesh, params);
   }
 }

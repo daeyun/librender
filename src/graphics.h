@@ -18,28 +18,53 @@
 
 namespace scry {
 
-struct CameraParams {
-  glm::vec3 target;
-  float el;
-  float az;
-  float r;
-  float up_ang;
-};
+enum Axis { X, Y, Z };
 
-struct ShaderViewParams {
+struct ShaderParams {
   glm::mat4 view_mat;
   glm::mat4 projection_mat;
   glm::mat4 model_mat;
   glm::vec3 eye_direction;
+
+  std::vector<LightProperties> lights;
+
+  float shininess;
+  float strength;
+  glm::vec3 ambient;
+};
+
+class RenderParams {
+  public:
+    RenderParams();
+
+    bool will_normalize;
+    glm::vec3 target;
+    float fov;
+    Axis up_axis;
+    bool are_axes_visible;
+    float up_angle;
+    float el;
+    float az;
+    float r;
+    float near;
+    float far;
+    int image_width;
+    int image_height;
+    int num_msaa_samples;
+    glm::vec4 background;
+    arma::fvec color;
+    bool is_color_forced;
+
+    std::string in_filename;
+    std::string out_filename;
+    bool can_overwrite;
+
+    ShaderParams shader_params;
 };
 
 const float kPi = glm::pi<float>();
 
-void Render(const Shape& object, const std::string& filename = "");
-void InitializeShader(ShaderProperties& shader_properties);
+void Render(const Shape& shape, RenderParams& params);
 void RotateVector(const glm::vec3& axis, const float angle, glm::vec3& vector);
-void ComputeMatrices(const CameraParams& params, ShaderViewParams& output);
-void SaveAsPNG(const std::string& filename, const uint8_t* data, int w, int h);
-void UpdateShaderView(const ShaderViewParams& view_params,
-                      ShaderProperties& shader_properties);
+void ComputeMatrices(RenderParams& render_params);
 }

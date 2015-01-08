@@ -32,15 +32,15 @@ add_definitions(-std=c++11)
 
 # Pass in the version string at compile time.
 # From git:  git tag -a v0.1 -m 'version 0.1'
-find_package(Git)
-if(GIT_FOUND)
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} describe --abbrev=4 --dirty --always --tags --match "v[0-9]*"
-        OUTPUT_VARIABLE DESCRIBE_BUILD
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-    string(REGEX MATCH "[0-9]+\\.[0-9]+-?[a-zA-Z0-9-]*" VERSION_STRING ${DESCRIBE_BUILD})
-    add_definitions(-DVERSION=\"${VERSION_STRING}\")
-endif()
+#find_package(Git)
+#if(GIT_FOUND)
+#    execute_process(
+#        COMMAND ${GIT_EXECUTABLE} describe --abbrev=4 --dirty --always --tags --match "v[0-9]*"
+#        OUTPUT_VARIABLE DESCRIBE_BUILD
+#        OUTPUT_STRIP_TRAILING_WHITESPACE)
+#    STRING(REGEX MATCH "[0-9]+\\.[0-9]+-?[a-zA-Z0-9-]*" VERSION_STRING ${DESCRIBE_BUILD})
+#    add_definitions(-DVERSION=\"${VERSION_STRING}\")
+#endif()
 
 # Used by both src and test
 include_directories(${SCRY_SOURCE_DIR}/src)

@@ -20,7 +20,6 @@ const size_t kNumMaxLights = 20;
 // shader and shader attribute ids
 struct GLShaderLight {
   GLuint isEnabled;
-  GLuint Ambient;
   GLuint LightColor;
   GLuint LightPosition;
   GLuint ConstantAttenuation;
@@ -37,6 +36,7 @@ struct GLShader {
   GLuint shininess;
   GLuint strength;
   GLuint num_lights;
+  GLuint ambient;
   std::vector<GLShaderLight> lights;
 };
 
@@ -44,15 +44,13 @@ class LightProperties {
  public:
   LightProperties() {
     is_enabled = true;
-    ambient = glm::vec3(0.2, 0.2, 0.2);
     light_color = glm::vec3(1.0, 1.0, 1.0);
-    light_position = glm::vec3(3.0, 3.0, 3.0);
+    light_position = glm::vec3(2, 0, 1);
     constant_attenuation = 1;
-    linear_attenuation = 0;
-    quadratic_attenuation = 0;
+    linear_attenuation = 0.4;
+    quadratic_attenuation = 0.3;
   }
   bool is_enabled;
-  glm::vec3 ambient;
   glm::vec3 light_color;
   glm::vec3 light_position;
   float constant_attenuation;

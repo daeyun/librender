@@ -14,15 +14,15 @@
 #include <glm/glm.hpp>
 #include "shader.h"
 #include "shader_object.h"
+#include "graphics.h"
 
 namespace scry {
 
 class Annotation {
  public:
-  Annotation(float grid_z);
+  Annotation(float grid_z, RenderParams& render_params);
   ~Annotation();
-  void draw(const glm::mat4& projection, const glm::mat4& view,
-            const glm::mat4& model);
+  void draw(const RenderParams& render_params);
 
   Shape* axis_data;
   Shape* grid_data;

@@ -18,12 +18,13 @@ namespace scry {
 namespace gui {
 
 void Initialize();
-GLFWwindow* CreateWindow(int width, int height, const std::string& title);
+GLFWwindow* CreateWindow(int width, int height, const std::string& title,
+                         const RenderParams& render_params);
 void UpdateWindowThread();
 void InitWindowControls(GLFWwindow* window);
 void KeyEventHandler(GLFWwindow* window, int key, int scancode, int action,
                      int mods);
 
-extern CameraParams* camera_params;
+extern RenderParams* render_params;
 }
 }

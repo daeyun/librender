@@ -56,7 +56,7 @@ GLuint ShaderFromSource(const std::string& vertex_shader_source,
 void Compile(GLuint id, const std::string& source_code) {
   // Compile
   char const* source_ptr = source_code.c_str();
-  glShaderSource(id, 1, &source_ptr, NULL);
+  glShaderSource(id, 1, &source_ptr, nullptr);
   glCompileShader(id);
 
   // Check
@@ -66,7 +66,7 @@ void Compile(GLuint id, const std::string& source_code) {
   glGetShaderiv(id, GL_INFO_LOG_LENGTH, &log_length);
   if (log_length > 0 || !is_compiled) {
     std::vector<char> error_message(log_length + 1);
-    glGetShaderInfoLog(id, log_length, NULL, &error_message[0]);
+    glGetShaderInfoLog(id, log_length, nullptr, &error_message[0]);
     throw std::runtime_error(&error_message[0]);
   }
 }
@@ -85,7 +85,7 @@ GLuint LinkProgram(GLuint vertex_shader_id, GLuint fragment_shader_id) {
   glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &log_length);
   if (log_length > 0 || !is_linked) {
     std::vector<char> error_message(log_length + 1);
-    glGetProgramInfoLog(program_id, log_length, NULL, &error_message[0]);
+    glGetProgramInfoLog(program_id, log_length, nullptr, &error_message[0]);
     throw std::runtime_error(&error_message[0]);
   }
 

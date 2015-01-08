@@ -11,14 +11,14 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
-namespace scry {
-namespace io {
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
+namespace scry {
+namespace io {
 
 std::string FindUserDir();
 std::string ExpandUserPath(std::string path);
-std::string FindFullPath(std::string path);
+std::string FindFullPath(const std::string& path, const std::string& base="");
 std::string AppendToFilename(const std::string& path, const std::string& str);
 std::string RandomString(size_t len);
 void RemoveTrailingSep(std::string& path);

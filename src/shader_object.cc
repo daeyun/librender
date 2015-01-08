@@ -12,6 +12,7 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 #include "shader.h"
+#include "graphics.h"
 #include "databuffer.h"
 
 namespace scry {
@@ -24,7 +25,7 @@ ShaderObject::ShaderObject(const Shape* shape, const GLuint shader_id,
   glGenVertexArrays(1, &this->vertex_array_id);
   glBindVertexArray(this->vertex_array_id);
 
-  if (texture_filename != NULL) {
+  if (texture_filename != nullptr) {
     // TODO
     this->texture = LoadTexture(texture_filename);
   }
@@ -41,6 +42,7 @@ ShaderObject::ShaderObject(const Shape* shape, const GLuint shader_id,
       glGetUniformLocation(shader_id, "EyeDirection");
   this->shader_attribs.shininess = glGetUniformLocation(shader_id, "Shininess");
   this->shader_attribs.strength = glGetUniformLocation(shader_id, "Strength");
+  this->shader_attribs.ambient = glGetUniformLocation(shader_id, "Ambient");
 
   for (size_t i = 0; i < kNumMaxLights; i++) {
     std::string name_prefix = "Lights";
@@ -49,8 +51,6 @@ ShaderObject::ShaderObject(const Shape* shape, const GLuint shader_id,
     GLShaderLight light;
     light.isEnabled =
         glGetUniformLocation(shader_id, (name_prefix + "isEnabled").c_str());
-    light.Ambient =
-        glGetUniformLocation(shader_id, (name_prefix + "Ambient").c_str());
     light.LightColor =
         glGetUniformLocation(shader_id, (name_prefix + "LightColor").c_str());
     light.LightPosition = glGetUniformLocation(
@@ -83,7 +83,7 @@ ShaderObject::ShaderObject(const Shape* shape, const GLuint shader_id,
         &this->shape->color[0], this->shape->color.n_elem * sizeof(float)));
   }
 
-  if (texture_filename != NULL) {
+  if (texture_filename != nullptr) {
     attribute_buffers.push_back(VertexAttribBuffer(
         GL_ARRAY_BUFFER, 3, this->shape->uv.n_rows, GL_FLOAT,
         &this->shape->uv[0], this->shape->uv.n_elem * sizeof(float)));
@@ -119,39 +119,45 @@ GLuint ShaderObject::LoadTexture(const char* texture_filename) {
   throw std::runtime_error("Not implemented");
 }
 
-void ShaderObject::draw(const ShaderProperties& shader_properties) {
+void ShaderObject::draw(const RenderParams& render_params) {
+  auto mv = render_params.shader_params.view_mat *
+            render_params.shader_params.model_mat;
+  auto mvp = render_params.shader_params.projection_mat * mv;
+  auto normal_mat = glm::transpose(glm::inverse(mv));
+
   glBindVertexArray(this->vertex_array_id);
 
   GLuint shader_id = this->shader_attribs.id;
   glUseProgram(shader_id);
 
-  glUniformMatrix4fv(this->shader_attribs.mvp, 1, GL_FALSE,
-                     &shader_properties.mvp[0][0]);
-  glUniformMatrix4fv(this->shader_attribs.mv, 1, GL_FALSE,
-                     &shader_properties.mv[0][0]);
+  glUniformMatrix4fv(this->shader_attribs.mvp, 1, GL_FALSE, &mvp[0][0]);
+  glUniformMatrix4fv(this->shader_attribs.mv, 1, GL_FALSE, &mv[0][0]);
   glUniformMatrix4fv(this->shader_attribs.normal_mat, 1, GL_FALSE,
-                     &shader_properties.normal_mat[0][0]);
-  glUniform1i(this->shader_attribs.num_lights, shader_properties.lights.size());
+                     &normal_mat[0][0]);
+  glUniform1i(this->shader_attribs.num_lights,
+              render_params.shader_params.lights.size());
   glUniform3fv(this->shader_attribs.eye_direction, 1,
-               &shader_properties.eye_direction[0]);
-  glUniform1f(this->shader_attribs.shininess, shader_properties.shininess);
-  glUniform1f(this->shader_attribs.strength, shader_properties.strength);
+               &render_params.shader_params.eye_direction[0]);
+  glUniform1f(this->shader_attribs.shininess,
+              render_params.shader_params.shininess);
+  glUniform1f(this->shader_attribs.strength,
+              render_params.shader_params.strength);
+  glUniform3fv(this->shader_attribs.ambient, 1,
+               &render_params.shader_params.ambient[0]);
 
-  for (size_t i = 0; i < shader_properties.lights.size(); i++) {
+  for (size_t i = 0; i < render_params.shader_params.lights.size(); i++) {
     glUniform1i(this->shader_attribs.lights[i].isEnabled,
-                shader_properties.lights[i].is_enabled);
-    glUniform3fv(this->shader_attribs.lights[i].Ambient, 1,
-                 &shader_properties.lights[i].ambient[0]);
+                render_params.shader_params.lights[i].is_enabled);
     glUniform3fv(this->shader_attribs.lights[i].LightColor, 1,
-                 &shader_properties.lights[i].light_color[0]);
+                 &render_params.shader_params.lights[i].light_color[0]);
     glUniform3fv(this->shader_attribs.lights[i].LightPosition, 1,
-                 &shader_properties.lights[i].light_position[0]);
+                 &render_params.shader_params.lights[i].light_position[0]);
     glUniform1f(this->shader_attribs.lights[i].ConstantAttenuation,
-                shader_properties.lights[i].constant_attenuation);
+                render_params.shader_params.lights[i].constant_attenuation);
     glUniform1f(this->shader_attribs.lights[i].LinearAttenuation,
-                shader_properties.lights[i].linear_attenuation);
+                render_params.shader_params.lights[i].linear_attenuation);
     glUniform1f(this->shader_attribs.lights[i].QuadraticAttenuation,
-                shader_properties.lights[i].quadratic_attenuation);
+                render_params.shader_params.lights[i].quadratic_attenuation);
   }
 
   /* TODO
