@@ -10,7 +10,6 @@
 
 struct LightProperties {
     bool isEnabled;
-    vec3 Ambient;
     vec3 LightColor;
     vec3 LightPosition;
 
@@ -22,6 +21,7 @@ struct LightProperties {
 
 const int NumMaxLights = 20;
 
+uniform vec3 Ambient;
 uniform int NumLights;
 uniform vec3 EyeDirection;
 uniform float Shininess;
@@ -37,7 +37,7 @@ out vec4 FragColor;
 
 void main() {
     vec3 normal = normalize(Normal);
-    vec4 col = vec4(0, 0, 0, 1);
+    vec4 col = vec4(Ambient, Color[3]);
 
     for (int lightIndex = 0; lightIndex < NumLights; lightIndex++) {
         if (!Lights[lightIndex].isEnabled) {
@@ -54,8 +54,8 @@ void main() {
 
         float attenuation = 1.0 /
             (Lights[lightIndex].ConstantAttenuation +
-             Lights[lightIndex].LinearAttenuation * lightDistance +
-             Lights[lightIndex].QuadraticAttenuation * lightDistance * lightDistance);
+             (Lights[lightIndex].LinearAttenuation * lightDistance) +
+             (Lights[lightIndex].QuadraticAttenuation * lightDistance * lightDistance));
 
         if(lambertian > 0.0) {
             vec3 halfDir = normalize(lightDir + EyeDirection);
@@ -63,9 +63,8 @@ void main() {
             specular = pow(specAngle, Shininess) * Strength;
         }
 
-        col += vec4(mix(Lights[lightIndex].Ambient, vec3(Color), 0.35) * attenuation +
-                lambertian * vec3(Color) * attenuation +
-                specular * mix(Lights[lightIndex].LightColor, vec3(Color), 0.35) * attenuation, 1.0);
+        col += vec4(lambertian * vec3(Color) * attenuation +
+               specular * mix(Lights[lightIndex].LightColor, vec3(Color), 0.65) * attenuation, 0.0);
     }
     FragColor = col;
 }

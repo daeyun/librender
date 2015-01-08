@@ -2,7 +2,7 @@
 #include <string>
 #include "shader_source.h"
 
-// Generated from simple.v.glsl and simple.f.glsl on 2015-01-02
+// Generated from simple.v.glsl and simple.f.glsl on 2015-01-07
 static const ShaderSource kSimpleShader = {
 "#version 330 core\n"
 "layout(location = 0) in vec3 VertexPosition;"
