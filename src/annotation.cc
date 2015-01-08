@@ -7,17 +7,7 @@
  */
 #include "annotation.h"
 
-#include <string>
-#include <vector>
-#include <GL/glew.h>
-#include <glm/glm.hpp>
 #include "shaders/simple_shader.h"
-#include "shape.h"
-#include "shader_object.h"
-#include "config.h"
-#include "graphics.h"
-
-extern GLuint scry_current_shader;
 
 namespace scry {
 

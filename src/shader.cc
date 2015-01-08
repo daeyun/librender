@@ -7,11 +7,7 @@
  */
 #include "shader.h"
 
-#include <string>
-#include <vector>
 #include <fstream>
-#include <GL/glew.h>
-#include "shaders/shader_source.h"
 
 namespace scry {
 namespace shader {

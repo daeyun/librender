@@ -10,12 +10,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <pwd.h>
-#include <vector>
-#include <cmath>
 #include <yaml-cpp/yaml.h>
 #include "io.h"
 #include "config.h"
-#include "graphics.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;

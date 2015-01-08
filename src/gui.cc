@@ -13,7 +13,6 @@
 #include <condition_variable>
 #include <glm/gtx/string_cast.hpp>
 #include "config.h"
-#include "graphics.h"
 
 namespace scry {
 namespace gui {
