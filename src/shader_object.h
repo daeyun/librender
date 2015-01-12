@@ -59,8 +59,6 @@ enum DataBufferLocation {
 class ShaderObject {
  public:
   ShaderObject() = default;
-  ShaderObject(const Shape* shape, const GLuint shader_id,
-               const RenderParams& render_params);
   virtual ~ShaderObject();
 
   virtual void Draw(const RenderParams& render_params,

@@ -71,8 +71,7 @@ std::string ExpandUserPath(std::string path) {
  * @return Absolute path
  */
 std::string FindFullPath(const std::string& path, const std::string& base) {
-  if (base.empty())
-    return fs::canonical(ExpandUserPath(path)).string();
+  if (base.empty()) return fs::canonical(ExpandUserPath(path)).string();
   return fs::absolute(ExpandUserPath(path), base).string();
 }
 

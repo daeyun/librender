@@ -42,8 +42,6 @@ GLuint ShaderFromSource(const std::string& shader_source) {
   // Link
   glLinkProgram(program_id);
 
-  _var(program_id);
-
   // Check
   GLint is_linked;
   int log_length;

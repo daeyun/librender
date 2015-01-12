@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-// Generated from trimesh_normal.glsl on 2015-01-11
+// Generated from trimesh_normal.glsl on 2015-01-12
 namespace scry {
 namespace shader {
 static const std::string kTrimeshNormalShader =

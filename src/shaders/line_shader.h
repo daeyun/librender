@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-// Generated from line.glsl on 2015-01-11
+// Generated from line.glsl on 2015-01-12
 namespace scry {
 namespace shader {
 static const std::string kLineShader =

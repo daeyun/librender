@@ -20,19 +20,6 @@
 namespace scry {
 namespace shader {
 
-ShaderObject::ShaderObject(const Shape* shape, const GLuint shader_id,
-                           const RenderParams& render_params) {
-  glGenVertexArrays(1, &this->vertex_array_id);
-  glBindVertexArray(this->vertex_array_id);
-
-  this->shader_id = shader_id;
-  this->shape = shape;
-
-  SetAttributes(render_params, this->attribs);
-  FillUniformLocations(shader_id, this->attribs);
-  SetupVAO(shape);
-}
-
 /**
  * @brief Copy data to data buffers and attach them to the vertex array object.
  */
@@ -106,7 +93,6 @@ void ShaderObject::UpdateVAO(const glm::mat4& mv, const glm::mat3& normal_mat) {
 void ShaderObject::FillUniformLocations(
     GLuint shader_id,
     std::unordered_map<string, ShaderAttribute>& shader_globals) {
-  _assert(glIsProgram(shader_id));
 
   this->matrices.model_view_projection =
       glGetUniformLocation(shader_id, "iModelViewProjectionMatrix");
@@ -124,8 +110,6 @@ void ShaderObject::FillUniformLocations(
 }
 
 ShaderObject::~ShaderObject() {
-  _var(position_buffer);
-
   if (position_buffer) {
     delete position_buffer;
   }
@@ -168,9 +152,6 @@ void ShaderObject::Draw(const RenderParams& render_params, bool is_view_space) {
     for (size_t i = 0; i < render_params.shader_params.lights.size(); ++i) {
       this->light_positions[i] = util::MatMult(
           mv, render_params.shader_params.lights[i].light_position);
-      _var(this->light_positions[i][0]);
-      _var(this->light_positions[i][1]);
-      _var(this->light_positions[i][2]);
     }
   }
 

@@ -129,20 +129,21 @@ void main() {
              (iLights[i].LinearAttenuation * light_dist) +
              (iLights[i].QuadraticAttenuation * light_dist * light_dist));
 
-        if(lambertian > 0.0) {
+        if (lambertian > 0.0) {
             vec3 half_dir = normalize(light_dir + iEyeDirection);
             float spec_angle = max(dot(half_dir, fragment_in.normal), 0.0);
             specular = pow(spec_angle, iShininess) * iStrength;
         }
 
         col += vec4(lambertian * vec3(fragment_in.color) * attenuation +
-               specular * mix(iLights[i].Color, vec3(fragment_in.color), 0.65) * attenuation, 0.0);
+               specular * mix(iLights[i].Color, vec3(fragment_in.color), 0.3)
+               * attenuation, 0.0);
     }
 
-    float edge_dist = min(min(fragment_in.d[0], fragment_in.d[1]), fragment_in.d[2])
-                        /0.001;
-    float edge_intensity = pow(4, -pow(edge_dist, 2));
+    float edge_dist = min(min(fragment_in.d[0], fragment_in.d[1]),
+            fragment_in.d[2]) /0.001;
 
+    float edge_intensity = pow(4, -pow(edge_dist, 2));
     vec4 edge_col = vec4(0, 0, 0, 0);
 
     FragmentColor = mix(col, edge_col, edge_intensity);

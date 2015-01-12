@@ -71,7 +71,8 @@ void InitWindowControls(GLFWwindow* window) {
 
 void KeyEventHandler(GLFWwindow* window, int key, int scancode, int action,
                      int mods) {
-  float delta = scry::config::window_control_speed * std::sqrt(render_params->r) * 0.07;
+  float delta =
+      scry::config::window_control_speed * std::sqrt(render_params->r) * 0.07;
   if (action & (GLFW_PRESS | GLFW_REPEAT)) switch (key) {
       case GLFW_KEY_UP:
         if (mods & GLFW_MOD_SHIFT)
@@ -87,13 +88,13 @@ void KeyEventHandler(GLFWwindow* window, int key, int scancode, int action,
         break;
       case GLFW_KEY_LEFT:
         if (mods & GLFW_MOD_SHIFT)
-          render_params->up_angle -= delta*20;
+          render_params->up_angle -= delta * 20;
         else
           render_params->az -= delta;
         break;
       case GLFW_KEY_RIGHT:
         if (mods & GLFW_MOD_SHIFT)
-          render_params->up_angle += delta*20;
+          render_params->up_angle += delta * 20;
         else
           render_params->az += delta;
         break;
