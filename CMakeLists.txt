@@ -22,7 +22,8 @@ set(CORELIBS ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${ARMADILLO_LIBRARIES} ${Boost_
 set(INCLUDE_DIRS ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 
 if (DEBUG)
-    set(CMAKE_CXX_FLAGS "-g -Wall")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -g -rdynamic")
     add_definitions(-DDEBUG)
 else()
     set(CMAKE_CXX_FLAGS "-Ofast")
