@@ -11,34 +11,8 @@
 #include <vector>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
-#include "shaders/shader_source.h"
 
 namespace scry {
-
-const size_t kNumMaxLights = 20;
-
-// shader and shader attribute ids
-struct GLShaderLight {
-  GLuint isEnabled;
-  GLuint LightColor;
-  GLuint LightPosition;
-  GLuint ConstantAttenuation;
-  GLuint LinearAttenuation;
-  GLuint QuadraticAttenuation;
-};
-
-struct GLShader {
-  GLuint id;
-  GLuint mvp;
-  GLuint mv;
-  GLuint normal_mat;
-  GLuint eye_direction;
-  GLuint shininess;
-  GLuint strength;
-  GLuint num_lights;
-  GLuint ambient;
-  std::vector<GLShaderLight> lights;
-};
 
 class LightProperties {
  public:
@@ -75,19 +49,11 @@ class ShaderProperties {
 
 namespace shader {
 
-const std::string kVertexSuffix_ = ".v.glsl";
-const std::string kFragmentSuffix_ = ".f.glsl";
-
-GLuint Shader(const std::string& filename_prefix);
-GLuint Shader(const std::string& vertex_shader_source,
-              const std::string& fragment_shader_source);
-GLuint Shader(const ShaderSource& shader_source);
+GLuint Shader(const std::string& shader_source);
 
 void ReadFromFile(const std::string& filename, std::string& content);
-void Compile(GLuint id, const std::string& source_code);
-GLuint LinkProgram(GLuint vertex_shader_id, GLuint fragment_shader_id);
-GLuint ShaderFromSource(const std::string& vertex_shader_source,
-                        const std::string& fragment_shader_source);
+void Compile(GLuint id, const std::string& source_code, const std::string& shader_name);
+GLuint ShaderFromSource(const std::string& shader_source);
 
 static std::vector<GLuint> shader_ids;
 }

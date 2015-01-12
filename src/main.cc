@@ -6,13 +6,13 @@
  * @copyright Scry is free software released under the BSD 2-Clause license.
  */
 #include "main.h"
-
 #include <iostream>
 #include <vector>
 #include "config.h"
 #include "mesh_loader.h"
 #include "graphics.h"
 #include "scry.h"
+#include "debug.h"
 
 int main(int argc, char* argv[]) {
   std::vector<scry::RenderParams> all_params;

@@ -10,16 +10,18 @@
 #include <armadillo>
 
 namespace scry {
+using arma::fmat;
+using arma::umat;
 
-enum ShapeType { kTriangleMesh, kLines };
+enum class ShapeType { kTriangles, kLines, kPoints };
 
 struct Shape {
   ShapeType type;
 
-  arma::fmat v;
-  arma::umat f;
-  arma::fmat vn;
-  arma::fmat uv;
-  arma::fmat color;
+  fmat v;   // vertex position
+  fmat vn;  // vertex normal
+  fmat vc;  // vertex color
+  fmat uv;  // vertex texture coordinate
+  umat ind; // index
 };
 }

@@ -15,6 +15,7 @@
 #include <string.h>
 #include <sstream>
 #include <iostream>
+#include <unistd.h>
 
 #define __COLOR_RESET "\033[0m"
 #define _COLOR_NORMAL(str) "\x1B[0m" str __COLOR_RESET
@@ -34,12 +35,21 @@
                     __FILE__, __LINE__, __func__);                    \
   }
 
+#define _var2(name)                                                    \
+  {                                                                   \
+    std::ostringstream val_str;                                       \
+    val_str << name;                                                  \
+    DisplayVariable2(#name, val_str.str(), sizeof(name), \
+                    __FILE__, __LINE__, __func__);                    \
+  }
+
 #define _assert(expr)                                                       \
   if (!(expr)) {                                                            \
     fprintf(stderr, _COLOR_RED("[ERROR] (%s:%d %s) assertion %s failed\n"), \
             __FILE__, __LINE__, __func__, #expr);                           \
-  }                                                                         \
-  __check_errno()
+    __check_errno()                                                         \
+    _break                                                                  \
+  }
 
 #define _break \
   { asm("int $3"); }
@@ -61,6 +71,13 @@ static void DisplayVariable(std::string name, std::string value, size_t size,
           "[INFO]  (%s:%d %s) " _COLOR_MAGENTA("%s=%s") "  &%s=%p  %d\n",
           file.c_str(), line, func.c_str(), name.c_str(), value.c_str(),
           name.c_str(), ptr, (int)size);
+}
+static void DisplayVariable2(std::string name, std::string value, size_t size,
+                            std::string file, int line,
+                            std::string func) {
+  fprintf(stderr,
+          "[INFO]  (%s:%d %s) " _COLOR_MAGENTA("%s=%s") "          %d\n",
+          file.c_str(), line, func.c_str(), name.c_str(), value.c_str(), (int)size);
 }
 
 extern char** environ;

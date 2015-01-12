@@ -18,12 +18,14 @@
 #include "shape.h"
 #include "annotation.h"
 #include "shader.h"
-#include "shaders/blinn_shader.h"
 #include "shader_object.h"
 #include "config.h"
 #include "framebuffer.h"
 #include "io.h"
 #include "gui.h"
+#include "shaders/trimesh_shape_shader.h"
+#include "trimesh_shape_shader_object.h"
+#include "debug.h"
 
 namespace scry {
 
@@ -113,19 +115,20 @@ void Render(const Shape& shape, RenderParams& params) {
 
   gui::render_params = &params;
 
-  GLuint shader_id = shader::Shader(kBlinnShader);
-
-  ShaderObject drawable_object(&shape, shader_id, nullptr);
 
   float min_z = arma::min(shape.v.row(2));
   Annotation annotation(min_z, params);
+
+  GLuint shader_id = shader::Shader(shader::kTrimeshShapeShader);
+  auto drawable_object =
+      shader::TrimeshShapeShaderObject(&shape, shader_id, params);
 
   do {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     ComputeMatrices(params);
 
-    annotation.draw(params);
-    drawable_object.draw(params);
+    annotation.Draw(params);
+    drawable_object.Draw(params, false);
 
     glfwSwapBuffers(window);
     glfwWaitEvents();

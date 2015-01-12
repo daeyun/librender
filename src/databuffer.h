@@ -15,23 +15,24 @@ namespace scry {
 class DataBuffer {
  public:
   DataBuffer() : is_initialized(false){};
-  DataBuffer(GLenum target, GLenum gl_type, const GLvoid* data,
-             GLsizeiptr data_bytes);
-  void clean();
+  ~DataBuffer();
+  DataBuffer(GLenum target, GLenum gl_type, const void* data,
+             GLsizeiptr data_bytes, bool is_static = true);
+  void SetBufferData(const void* data, const size_t size,
+                     bool is_static = true);
 
   bool is_initialized;
   GLuint buffer_id;
   GLenum target;
   GLenum gl_type;
-  const GLvoid* data;
-  GLsizeiptr data_bytes;
 };
 
 class VertexAttribBuffer : public DataBuffer {
  public:
   VertexAttribBuffer();
   VertexAttribBuffer(GLenum target, GLuint attrib_index, GLint attrib_size,
-                     GLenum gl_type, const GLvoid* data, size_t data_bytes);
+                     GLenum gl_type, const void* data, size_t data_bytes,
+                     bool is_static = true);
   GLuint attrib_index;
   GLint attrib_size;
 };
@@ -40,7 +41,7 @@ class IndexBuffer : public DataBuffer {
  public:
   IndexBuffer() : DataBuffer(){};
   IndexBuffer(GLenum target, GLenum mode, GLint num_item, GLenum gl_type,
-              const GLvoid* data, size_t data_bytes);
+              const void* data, size_t data_bytes, bool is_static = true);
   void draw();
 
   GLenum mode;

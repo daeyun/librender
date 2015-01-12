@@ -13,6 +13,7 @@
 #include <yaml-cpp/yaml.h>
 #include "io.h"
 #include "config.h"
+#include "debug.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -239,7 +240,7 @@ void InitFromFile(const std::string& filename, RenderParams& params) {
           light.light_position[j] =  
               config["lights"][i]["position"][j].as<float>();
       if (config["lights"][i]["color"].IsDefined())
-        for (size_t j = 0; j < config["lights"][i]["color"][i].size(); ++j)
+        for (size_t j = 0; j < config["lights"][i]["color"].size(); ++j)
           light.light_color[j] = config["lights"][i]["color"][j].as<float>();
       if (config["lights"][i]["is-enabled"].IsDefined())
         light.is_enabled = config["lights"][i]["is-enabled"].as<bool>();
@@ -247,10 +248,10 @@ void InitFromFile(const std::string& filename, RenderParams& params) {
         light.linear_attenuation =
             config["lights"][i]["linear-attenuation"].as<float>();
       if (config["lights"][i]["constant-attenuation"].IsDefined())
-        light.linear_attenuation =
+        light.constant_attenuation =
             config["lights"][i]["constant-attenuation"].as<float>();
       if (config["lights"][i]["quadratic-attenuation"].IsDefined())
-        light.linear_attenuation =
+        light.quadratic_attenuation =
             config["lights"][i]["quadratic-attenuation"].as<float>();
       params.shader_params.lights.push_back(light);
     }

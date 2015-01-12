@@ -91,6 +91,7 @@ std::string AppendToFilename(const std::string& path, const std::string& str) {
   fs::path dir = p;
   dir.remove_filename();
   std::string rawname = p.stem().string();
+  if (rawname == ".") rawname = "";
   // ext includes the dot (e.g. ".png"); empty if not found.
   std::string ext = p.extension().string();
   std::string new_filename = rawname + str + ext;

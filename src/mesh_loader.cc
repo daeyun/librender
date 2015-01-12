@@ -60,7 +60,7 @@ void LoadObj(const RenderParams& render_params, Shape& mesh) {
     }
 
     mesh.v = join_cols(mesh.v, shape_v);
-    mesh.f = join_cols(mesh.f, shape_f);
+    mesh.ind = join_cols(mesh.ind, shape_f);
     mesh.vn = join_cols(mesh.vn, shape_n);
     mesh.uv = join_cols(mesh.uv, shape_uv);
   }
@@ -86,10 +86,10 @@ void LoadObj(const RenderParams& render_params, Shape& mesh) {
   }
 
   // RGBA color per vertex
-  mesh.color.reshape(4, mesh.v.n_cols);
-  mesh.color.each_col() = render_params.color;
+  mesh.vc.reshape(4, mesh.v.n_cols);
+  mesh.vc.each_col() = render_params.color;
 
-  mesh.type = kTriangleMesh;
+  mesh.type = ShapeType::kTriangles;
 }
 
 /**
