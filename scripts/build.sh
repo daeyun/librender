@@ -6,7 +6,7 @@ OPTS=${OPTS//--gen/}
 OPTS=${OPTS//--cmake/}
 OPTS=${OPTS//--make/}
 OPTS=${OPTS//--test/}
-OPTS=${OPTS//--devel/}
+OPTS=${OPTS//--lldb/}
 OPTS=${OPTS//--debug/}
 OPTS=${OPTS//--run/}
 OPTS=${OPTS//--clean/}
@@ -30,7 +30,7 @@ fi
 CMAKE_ARGS="-H. "
 MAKE_ARGS=""
 
-if [[ $@ =~ (--devel|--test|--debug) ]]; then
+if [[ $@ =~ (--test|--debug) ]]; then
 CMAKE_ARGS+="-Bbuild-dev "
 MAKE_ARGS+="-Cbuild-dev"
 BIN_DIR="bin-dev"
@@ -82,10 +82,15 @@ if ${DID_BUILD}; then
 green "Build successful"
 fi
 
-if [[ $@ =~ (--run) ]]; then
+if [[ $@ =~ (--lldb) ]]; then
+yellow "cd ${BIN_DIR}"
+cd ${BIN_DIR}
+yellow "lldb -- ./scry ${OPTS}"
+lldb -- ./scry ${OPTS}
+
+elif [[ $@ =~ (--run) ]]; then
 yellow "cd ${BIN_DIR}"
 cd ${BIN_DIR}
 yellow "./scry ${OPTS}"
 ./scry ${OPTS}
 fi
-
