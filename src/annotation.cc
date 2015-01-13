@@ -7,13 +7,16 @@
  * license.
  */
 #include "annotation.h"
-#include "debug.h"
 
 #include "line_shader_object.h"
+#include "debug.h"
 
 namespace librender {
 
 Annotation::Annotation(float grid_z, RenderParams& render_params) {
+  grid_data = axis_data = nullptr;
+  gl_axes = gl_grid = nullptr;
+
   std::vector<std::string> labels = {"x", "y", "z"};
   float length = 0.6;
   arma::fmat origin = {0, 0, 0};
@@ -43,57 +46,57 @@ Annotation::Annotation(float grid_z, RenderParams& render_params) {
 
     this->gl_axes = new shader::LineShaderObject(this->axis_data, line_shader,
                                                  render_params);
-  } else {
-    this->axis_data = nullptr;
   }
 
   length = render_params.shader_params.grid_size;
   int num_cells = render_params.shader_params.grid_num_cells;
 
-  this->grid_data = new Shape();
-  this->grid_data->type = ShapeType::kLines;
-  this->grid_data->v.reshape(3, (num_cells + 1) * 4);
-  this->grid_data->ind.reshape(2, (num_cells + 1) * 4);
-  this->grid_data->vc.reshape(4, (num_cells + 1) * 4);
-  this->grid_data->vc.each_col() =
-      arma::fvec(&render_params.shader_params.grid_color[0], 4);
+  if (length != 0 && num_cells != 0) {
+    this->grid_data = new Shape();
+    this->grid_data->type = ShapeType::kLines;
+    this->grid_data->v.reshape(3, (num_cells + 1) * 4);
+    this->grid_data->ind.reshape(2, (num_cells + 1) * 4);
+    this->grid_data->vc.reshape(4, (num_cells + 1) * 4);
+    this->grid_data->vc.each_col() =
+        arma::fvec(&render_params.shader_params.grid_color[0], 4);
 
-  size_t vcount = 0;
-  size_t lcount = 0;
+    size_t vcount = 0;
+    size_t lcount = 0;
 
-  float spacing = length / num_cells;
-  float half = length / 2;
+    float spacing = length / num_cells;
+    float half = length / 2;
 
-  for (float x = -half; x <= half + spacing / 2; x += spacing) {
-    arma::fvec start = {x, -half, grid_z};
-    arma::fvec end = {x, half, grid_z};
+    for (float x = -half; x <= half + spacing / 2; x += spacing) {
+      arma::fvec start = {x, -half, grid_z};
+      arma::fvec end = {x, half, grid_z};
 
-    this->grid_data->v.col(vcount) = start;
-    this->grid_data->ind(0, lcount) = vcount;
-    vcount++;
+      this->grid_data->v.col(vcount) = start;
+      this->grid_data->ind(0, lcount) = vcount;
+      vcount++;
 
-    this->grid_data->v.col(vcount) = end;
-    this->grid_data->ind(1, lcount) = vcount;
-    vcount++;
-    lcount++;
+      this->grid_data->v.col(vcount) = end;
+      this->grid_data->ind(1, lcount) = vcount;
+      vcount++;
+      lcount++;
+    }
+
+    for (float x = -half; x <= half + spacing / 2; x += spacing) {
+      arma::fvec start = {-half, x, grid_z};
+      arma::fvec end = {half, x, grid_z};
+
+      this->grid_data->v.col(vcount) = start;
+      this->grid_data->ind(0, lcount) = vcount;
+      vcount++;
+
+      this->grid_data->v.col(vcount) = end;
+      this->grid_data->ind(1, lcount) = vcount;
+      vcount++;
+      lcount++;
+    }
+
+    this->gl_grid = new shader::LineShaderObject(this->grid_data, line_shader,
+                                                 render_params);
   }
-
-  for (float x = -half; x <= half + spacing / 2; x += spacing) {
-    arma::fvec start = {-half, x, grid_z};
-    arma::fvec end = {half, x, grid_z};
-
-    this->grid_data->v.col(vcount) = start;
-    this->grid_data->ind(0, lcount) = vcount;
-    vcount++;
-
-    this->grid_data->v.col(vcount) = end;
-    this->grid_data->ind(1, lcount) = vcount;
-    vcount++;
-    lcount++;
-  }
-
-  this->gl_grid =
-      new shader::LineShaderObject(this->grid_data, line_shader, render_params);
 }
 
 Annotation::~Annotation() {
@@ -109,9 +112,11 @@ Annotation::~Annotation() {
 }
 
 void Annotation::Draw(const RenderParams& render_params) {
-  if (render_params.are_axes_visible) {
+  if (gl_axes != nullptr) {
     gl_axes->Draw(render_params, true);
   }
-  gl_grid->Draw(render_params, true);
+  if (gl_grid != nullptr) {
+    gl_grid->Draw(render_params, true);
+  }
 }
 }
