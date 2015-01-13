@@ -12,8 +12,6 @@
 #include <glm/glm.hpp>
 #include "yaml-cpp/yaml.h"
 
-// Default values
-
 namespace librender {
 namespace config {
 
