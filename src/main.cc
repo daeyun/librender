@@ -13,7 +13,6 @@
 #include "mesh_loader.h"
 #include "graphics.h"
 #include "librender.h"
-#include "debug.h"
 
 int main(int argc, char* argv[]) {
   std::vector<librender::RenderParams> all_params;

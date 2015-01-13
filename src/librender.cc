@@ -83,6 +83,12 @@ int InitFromMainArgs(int argc, char* argv[],
       RenderParams params;
       params.in_filename = filename;
       InitFromFile(config_file, params);
+
+      // Default lighting
+      if (params.shader_params.lights.empty()) {
+        LightProperties light;
+        params.shader_params.lights.push_back(light);
+      }
       all_params.push_back(params);
     }
 
@@ -256,10 +262,6 @@ void InitFromFile(const std::string& filename, RenderParams& params) {
             config["lights"][i]["quadratic-attenuation"].as<float>();
       params.shader_params.lights.push_back(light);
     }
-  } else {
-    // add default light source
-    LightProperties light;
-    params.shader_params.lights.push_back(light);
   }
 
   if (config["specular-exponent"].IsDefined()) {
