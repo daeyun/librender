@@ -3,7 +3,8 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-02
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #include "shader_object.h"
 
@@ -17,7 +18,7 @@
 #include "matrix_util.h"
 #include "debug.h"
 
-namespace scry {
+namespace librender {
 namespace shader {
 
 /**
@@ -71,14 +72,14 @@ void ShaderObject::SetupVAO(const Shape* shape) {
  */
 void ShaderObject::UpdateVAO(const glm::mat4& mv, const glm::mat3& normal_mat) {
   if (!shape->v.empty()) {
-    auto vertex_view = scry::util::MatMult(mv, shape->v);
+    auto vertex_view = librender::util::MatMult(mv, shape->v);
     void* data_ptr = vertex_view.memptr();
     size_t data_size = vertex_view.n_elem * sizeof(vertex_view[0]);
     position_buffer->SetBufferData(data_ptr, data_size);
   }
 
   if (!shape->vn.empty()) {
-    auto vertex_view = scry::util::MatMult(normal_mat, shape->v);
+    auto vertex_view = librender::util::MatMult(normal_mat, shape->v);
     void* data_ptr = vertex_view.memptr();
     size_t data_size = vertex_view.n_elem * sizeof(vertex_view[0]);
     normal_buffer->SetBufferData(data_ptr, data_size);
@@ -93,7 +94,6 @@ void ShaderObject::UpdateVAO(const glm::mat4& mv, const glm::mat3& normal_mat) {
 void ShaderObject::FillUniformLocations(
     GLuint shader_id,
     std::unordered_map<string, ShaderAttribute>& shader_globals) {
-
   this->matrices.model_view_projection =
       glGetUniformLocation(shader_id, "iModelViewProjectionMatrix");
   this->matrices.model_view =
@@ -173,6 +173,10 @@ void ShaderObject::Draw(const RenderParams& render_params, bool is_view_space) {
         break;
       case AttribType::kVec3:
         glUniform3fv(kv.second.uniform_location, 1,
+                     (const float*)kv.second.data_pointer);
+        break;
+      case AttribType::kVec4:
+        glUniform4fv(kv.second.uniform_location, 1,
                      (const float*)kv.second.data_pointer);
         break;
       default:

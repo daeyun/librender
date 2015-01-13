@@ -15,7 +15,7 @@ class CppHeaderFromGlsl:
     #include <string>
 
     // Generated from {filename} on {today}
-    namespace scry {{
+    namespace librender {{
     namespace shader {{
     static const std::string {cpp_var} =
     "{source}";

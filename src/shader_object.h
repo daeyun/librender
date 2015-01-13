@@ -3,7 +3,8 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-02
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #pragma once
 
@@ -16,7 +17,7 @@
 #include "shader.h"
 #include "graphics.h"
 
-namespace scry {
+namespace librender {
 namespace shader {
 using glm::vec3;
 using glm::vec4;
@@ -85,7 +86,7 @@ class ShaderObject {
                             unordered_map<string, ShaderAttribute>& attribs);
 
   const size_t kNumMaxLights = 20;
-  vector<vec3> light_positions {kNumMaxLights};
+  vector<vec3> light_positions{kNumMaxLights};
 
  private:
   virtual void SetAttributes(

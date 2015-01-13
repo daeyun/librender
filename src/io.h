@@ -3,7 +3,8 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-02
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #pragma once
 
@@ -13,12 +14,12 @@
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
-namespace scry {
+namespace librender {
 namespace io {
 
 std::string FindUserDir();
 std::string ExpandUserPath(std::string path);
-std::string FindFullPath(const std::string& path, const std::string& base="");
+std::string FindFullPath(const std::string& path, const std::string& base = "");
 std::string AppendToFilename(const std::string& path, const std::string& str);
 std::string RandomString(size_t len);
 void RemoveTrailingSep(std::string& path);

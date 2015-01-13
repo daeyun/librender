@@ -3,7 +3,8 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-02
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #include "gui.h"
 
@@ -14,7 +15,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include "config.h"
 
-namespace scry {
+namespace librender {
 namespace gui {
 
 RenderParams* render_params;
@@ -71,8 +72,8 @@ void InitWindowControls(GLFWwindow* window) {
 
 void KeyEventHandler(GLFWwindow* window, int key, int scancode, int action,
                      int mods) {
-  float delta =
-      scry::config::window_control_speed * std::sqrt(render_params->r) * 0.07;
+  float delta = librender::config::window_control_speed *
+                std::sqrt(render_params->r) * 0.07;
   if (action & (GLFW_PRESS | GLFW_REPEAT)) switch (key) {
       case GLFW_KEY_UP:
         if (mods & GLFW_MOD_SHIFT)

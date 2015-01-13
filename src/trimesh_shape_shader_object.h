@@ -3,7 +3,8 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-09
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #pragma once
 
@@ -16,7 +17,7 @@
 #include "shaders/trimesh_shape_shader.h"
 #include "shader_object.h"
 
-namespace scry {
+namespace librender {
 namespace shader {
 using glm::vec3;
 using glm::vec4;

@@ -3,7 +3,8 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-02
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #pragma once
 
@@ -12,7 +13,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-namespace scry {
+namespace librender {
 
 class LightProperties {
  public:
@@ -52,7 +53,8 @@ namespace shader {
 GLuint Shader(const std::string& shader_source);
 
 void ReadFromFile(const std::string& filename, std::string& content);
-void Compile(GLuint id, const std::string& source_code, const std::string& shader_name);
+void Compile(GLuint id, const std::string& source_code,
+             const std::string& shader_name);
 GLuint ShaderFromSource(const std::string& shader_source);
 
 static std::vector<GLuint> shader_ids;

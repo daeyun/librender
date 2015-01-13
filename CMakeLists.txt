@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8.4)
 option(TEST "Build all tests." OFF)
 option(DEBUG "Debug mode." OFF)
 
-project(SCRY)
+project(LIBRENDER)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -44,15 +44,15 @@ add_definitions(-std=c++11)
 #endif()
 
 # Used by both src and test
-include_directories(${SCRY_SOURCE_DIR}/src)
-include_directories(${SCRY_SOURCE_DIR}/src/third_party/tinyobjloader)
+include_directories(${LIBRENDER_SOURCE_DIR}/src)
+include_directories(${LIBRENDER_SOURCE_DIR}/src/third_party/tinyobjloader)
 include_directories(${GLEW_INCLUDE_DIRS})
 
 add_subdirectory(src)
 
 if (TEST)
     # This adds 'project(gmock)'
-    add_subdirectory(${SCRY_SOURCE_DIR}/lib/gmock-1.7.0)
+    add_subdirectory(${LIBRENDER_SOURCE_DIR}/lib/gmock-1.7.0)
     add_subdirectory(test)
 
     enable_testing()

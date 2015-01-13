@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 #include "debug.h"
 
-namespace scry {
+namespace librender {
 namespace util {
 
 /**
@@ -28,14 +28,13 @@ arma::fmat MatMult(const glm::mat3x3& a, const arma::fmat& b) {
 }
 
 glm::vec3 MatMult(const glm::mat4x4& a, const glm::vec3 b) {
-  auto c = a*glm::vec4(b, 1);
-  return glm::vec3(c)/c.w;
+  auto c = a * glm::vec4(b, 1);
+  return glm::vec3(c) / c.w;
 }
 
 void CopyMatInPlace(const arma::fmat& from, arma::fmat& to) {
   size_t size = to.n_elem * sizeof(to[0]);
   memcpy(to.memptr(), from.memptr(), size);
 }
-
 }
 }

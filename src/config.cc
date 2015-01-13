@@ -4,7 +4,8 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-02
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #include "config.h"
 
@@ -13,12 +14,11 @@
 
 // Default values
 
-namespace scry {
+namespace librender {
 namespace config {
 
 float window_control_speed = 1;
-std::string window_title = "Scry";
+std::string window_title = "librender";
 bool is_verbose = true;
-
 }
 }

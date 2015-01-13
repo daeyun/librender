@@ -3,11 +3,12 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-10
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #include "line_shader_object.h"
 
-namespace scry {
+namespace librender {
 namespace shader {
 using glm::vec3;
 using glm::vec4;

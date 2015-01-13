@@ -1,11 +1,12 @@
 /**
- * @file scry.cc
+ * @file librender.cc
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-02
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
-#include "scry.h"
+#include "librender.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
@@ -17,7 +18,7 @@
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
-namespace scry {
+namespace librender {
 namespace config {
 
 int InitFromMainArgs(int argc, char* argv[],
@@ -73,7 +74,7 @@ int InitFromMainArgs(int argc, char* argv[],
 
     po::notify(vm);
 
-    // $HOME/.scryrc by default
+    // $HOME/.renderrc by default
     std::string config_file = vm["config-file"].as<std::string>();
 
     auto in_files = vm["mesh-files"].as<std::vector<std::string>>();
@@ -141,8 +142,8 @@ int InitFromMainArgs(int argc, char* argv[],
 }
 
 void InitFromFile(const std::string& filename, RenderParams& params) {
-  std::string config_file = scry::io::UpSearch(fs::path(filename).parent_path(),
-                                               scry::kConfigFileName);
+  std::string config_file = librender::io::UpSearch(
+      fs::path(filename).parent_path(), librender::kConfigFileName);
   if (config_file.empty()) return;
 
   YAML::Node config = YAML::LoadFile(config_file);
@@ -187,11 +188,11 @@ void InitFromFile(const std::string& filename, RenderParams& params) {
   if (config["up-axis"].IsDefined()) {
     auto up_axis_string = config["up-axis"].as<std::string>();
     if (up_axis_string == "X") {
-      params.up_axis = scry::X;
+      params.up_axis = librender::X;
     } else if (up_axis_string == "Y") {
-      params.up_axis = scry::Y;
+      params.up_axis = librender::Y;
     } else {
-      params.up_axis = scry::Z;
+      params.up_axis = librender::Z;
     }
   }
 
@@ -237,7 +238,7 @@ void InitFromFile(const std::string& filename, RenderParams& params) {
       LightProperties light;
       if (config["lights"][i]["position"].IsDefined())
         for (size_t j = 0; j < config["lights"][i]["position"].size(); ++j)
-          light.light_position[j] =  
+          light.light_position[j] =
               config["lights"][i]["position"][j].as<float>();
       if (config["lights"][i]["color"].IsDefined())
         for (size_t j = 0; j < config["lights"][i]["color"].size(); ++j)
@@ -269,8 +270,37 @@ void InitFromFile(const std::string& filename, RenderParams& params) {
     params.shader_params.strength = config["specular-strength"].as<float>();
   }
 
-  if (config["specular-strength"].IsDefined()) {
-    params.shader_params.strength = config["specular-strength"].as<float>();
+  if (config["face-normal-arrow-length"].IsDefined()) {
+    params.shader_params.face_normal_length =
+        config["face-normal-arrow-length"].as<float>();
+  }
+
+  if (config["face-normal-arrow-color"].IsDefined()) {
+    for (size_t i = 0; i < config["face-normal-arrow-color"].size(); ++i)
+      params.shader_params.face_normal_color[i] =
+          config["face-normal-arrow-color"][i].as<float>();
+  }
+
+  if (config["edge-thickness"].IsDefined()) {
+    params.shader_params.edge_thickness = config["edge-thickness"].as<float>();
+  }
+
+  if (config["edge-color"].IsDefined()) {
+    for (size_t i = 0; i < config["edge-color"].size(); ++i)
+      params.shader_params.edge_color[i] = config["edge-color"][i].as<float>();
+  }
+
+  if (config["grid-size"].IsDefined()) {
+    params.shader_params.grid_size = config["grid-size"].as<float>();
+  }
+
+  if (config["grid-num-cells"].IsDefined()) {
+    params.shader_params.grid_num_cells = config["grid-num-cells"].as<int>();
+  }
+
+  if (config["grid-color"].IsDefined()) {
+    for (size_t i = 0; i < config["grid-color"].size(); ++i)
+      params.shader_params.grid_color[i] = config["grid-color"][i].as<float>();
   }
 
   if (config["ambient-color"].IsDefined()) {

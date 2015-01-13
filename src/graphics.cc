@@ -3,7 +3,8 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-02
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #include "graphics.h"
 
@@ -24,10 +25,12 @@
 #include "io.h"
 #include "gui.h"
 #include "shaders/trimesh_shape_shader.h"
+#include "shaders/trimesh_normal_shader.h"
 #include "trimesh_shape_shader_object.h"
+#include "trimesh_normal_shader_object.h"
 #include "debug.h"
 
-namespace scry {
+namespace librender {
 
 RenderParams::RenderParams() {
   // Default values
@@ -42,6 +45,14 @@ RenderParams::RenderParams() {
   shader_params.ambient = glm::vec3(0.2, 0.2, 0.2);
   shader_params.shininess = 20;
   shader_params.strength = 1;
+  shader_params.face_normal_color = glm::vec4(0, 0, 1, 1);
+  shader_params.face_normal_length = 0.015;
+  shader_params.edge_color = glm::vec4(0, 0, 0, 1);
+  shader_params.edge_thickness = 0.001;
+
+  shader_params.grid_color = glm::vec4(0.8, 0.8, 0.8, 1);
+  shader_params.grid_size = 2.5;
+  shader_params.grid_num_cells = 50;
 
   up_angle = 0;
   el = 1;
@@ -115,13 +126,15 @@ void Render(const Shape& shape, RenderParams& params) {
 
   gui::render_params = &params;
 
-
   float min_z = arma::min(shape.v.row(2));
   Annotation annotation(min_z, params);
 
   GLuint shader_id = shader::Shader(shader::kTrimeshShapeShader);
+  GLuint shader_id2 = shader::Shader(shader::kTrimeshNormalShader);
   auto drawable_object =
       shader::TrimeshShapeShaderObject(&shape, shader_id, params);
+  auto drawable_object2 =
+      shader::TrimeshNormalShaderObject(&shape, shader_id2, params);
 
   do {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -129,6 +142,7 @@ void Render(const Shape& shape, RenderParams& params) {
 
     annotation.Draw(params);
     drawable_object.Draw(params, false);
+    drawable_object2.Draw(params, false);
 
     glfwSwapBuffers(window);
     glfwWaitEvents();

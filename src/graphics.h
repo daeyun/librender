@@ -3,7 +3,8 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-02
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #pragma once
 
@@ -16,7 +17,7 @@
 #include "shape.h"
 #include "shader.h"
 
-namespace scry {
+namespace librender {
 
 enum Axis { X, Y, Z };
 
@@ -31,35 +32,45 @@ struct ShaderParams {
   float shininess;
   float strength;
   glm::vec3 ambient;
+
+  glm::vec4 face_normal_color;
+  float face_normal_length;
+
+  float edge_thickness;
+  glm::vec4 edge_color;
+
+  glm::vec4 grid_color = glm::vec4(0.8, 0.8, 0.8, 1);
+  float grid_size = 2.5;
+  int grid_num_cells = 25;
 };
 
 class RenderParams {
-  public:
-    RenderParams();
+ public:
+  RenderParams();
 
-    bool will_normalize;
-    glm::vec3 target;
-    float fov;
-    Axis up_axis;
-    bool are_axes_visible;
-    float up_angle;
-    float el;
-    float az;
-    float r;
-    float near;
-    float far;
-    int image_width;
-    int image_height;
-    int num_msaa_samples;
-    glm::vec4 background;
-    arma::fvec color;
-    bool is_color_forced;
+  bool will_normalize;
+  glm::vec3 target;
+  float fov;
+  Axis up_axis;
+  bool are_axes_visible;
+  float up_angle;
+  float el;
+  float az;
+  float r;
+  float near;
+  float far;
+  int image_width;
+  int image_height;
+  int num_msaa_samples;
+  glm::vec4 background;
+  arma::fvec color;
+  bool is_color_forced;
 
-    std::string in_filename;
-    std::string out_filename;
-    bool can_overwrite;
+  std::string in_filename;
+  std::string out_filename;
+  bool can_overwrite;
 
-    ShaderParams shader_params;
+  ShaderParams shader_params;
 };
 
 const float kPi = glm::pi<float>();

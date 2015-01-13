@@ -85,12 +85,12 @@ fi
 if [[ $@ =~ (--lldb) ]]; then
 yellow "cd ${BIN_DIR}"
 cd ${BIN_DIR}
-yellow "lldb -- ./scry ${OPTS}"
-lldb -- ./scry ${OPTS}
+yellow "lldb -- ./render ${OPTS}"
+lldb -- ./render ${OPTS}
 
 elif [[ $@ =~ (--run) ]]; then
 yellow "cd ${BIN_DIR}"
 cd ${BIN_DIR}
-yellow "./scry ${OPTS}"
-./scry ${OPTS}
+yellow "./render ${OPTS}"
+./render ${OPTS}
 fi

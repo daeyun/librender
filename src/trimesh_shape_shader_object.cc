@@ -3,11 +3,12 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-09
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #include "trimesh_shape_shader_object.h"
 
-namespace scry {
+namespace librender {
 namespace shader {
 using glm::vec3;
 using glm::vec4;
@@ -44,6 +45,10 @@ void TrimeshShapeShaderObject::SetAttributes(
       {"iEyeDirection", {AttribType::kVec3, (void*)&params.eye_direction[0]}},
       {"iShininess", {AttribType::kFloat, (float)params.shininess}},
       {"iStrength", {AttribType::kFloat, (float)params.strength}},
+      {"iEdgeThickness", {AttribType::kFloat, (float)params.edge_thickness}},
+      {"iEdgeColor", {AttribType::kVec4, (void*)&params.edge_color[0]}},
+      {"iGridSize", {AttribType::kFloat, (float)params.grid_size}},
+      {"iGridColor", {AttribType::kVec4, (void*)&params.grid_color[0]}},
   };
 
   for (size_t i = 0; i < kNumMaxLights; i++) {
@@ -55,7 +60,7 @@ void TrimeshShapeShaderObject::SetAttributes(
          {AttribType::kInt, (int)params.lights[i].is_enabled}},
         {name_prefix + "Color",
          {AttribType::kVec3, (void*)&params.lights[i].light_color[0]}},
-        {name_prefix + "Position", 
+        {name_prefix + "Position",
          {AttribType::kVec3, (void*)&params.lights[i].light_position[0]}},
         {name_prefix + "ConstantAttenuation",
          {AttribType::kFloat, (float)params.lights[i].constant_attenuation}},

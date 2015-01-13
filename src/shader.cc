@@ -3,7 +3,8 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-02
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #include "shader.h"
 
@@ -11,7 +12,7 @@
 #include <regex>
 #include "debug.h"
 
-namespace scry {
+namespace librender {
 namespace shader {
 
 GLuint Shader(const std::string& shader_source) {

@@ -3,7 +3,8 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-02
- * @copyright Scry is free software released under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #include "mesh_loader.h"
 
@@ -14,7 +15,7 @@
 #include "graphics.h"
 #include "shape.h"
 
-namespace scry {
+namespace librender {
 
 /**
  * @brief Import shape from a Wavefront .obj file. Vertex normals are estimated
@@ -26,20 +27,24 @@ void LoadObj(const RenderParams& render_params, Shape& mesh) {
   std::vector<tinyobj::shape_t> shapes;
   std::vector<tinyobj::material_t> materials;
 
-  std::string err = tinyobj::LoadObj(shapes, materials, render_params.in_filename.c_str());
+  std::string err =
+      tinyobj::LoadObj(shapes, materials, render_params.in_filename.c_str());
 
   if (!err.empty()) throw std::runtime_error(err);
   if (shapes.empty())
-    throw std::runtime_error(std::string("Shape not found in ") + render_params.in_filename);
+    throw std::runtime_error(std::string("Shape not found in ") +
+                             render_params.in_filename);
 
   const int kVertexDims = 3;
   const int kTextureDims = 2;
 
   for (tinyobj::shape_t shape : shapes) {
     if (shape.mesh.positions.empty())
-      throw std::runtime_error(std::string("Vertex not found in ") + render_params.in_filename);
+      throw std::runtime_error(std::string("Vertex not found in ") +
+                               render_params.in_filename);
     if (shape.mesh.indices.empty())
-      throw std::runtime_error(std::string("Face not found in ") + render_params.in_filename);
+      throw std::runtime_error(std::string("Face not found in ") +
+                               render_params.in_filename);
 
     int kNumVertex = shape.mesh.positions.size() / kVertexDims;
     int kNumFace = shape.mesh.indices.size() / kVertexDims;

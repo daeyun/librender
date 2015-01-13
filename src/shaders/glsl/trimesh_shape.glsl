@@ -4,7 +4,8 @@
  * @author Daeyun Shin <daeyun@dshin.org>
  * @version 0.1
  * @date 2015-01-02
- * @copyright Scry is free software under the BSD 2-Clause license.
+ * @copyright librender is free software released under the BSD 2-Clause
+ * license.
  */
 #version 330 core
 #define __SHADER_NAME__
@@ -17,7 +18,7 @@ uniform mat3 iVectorModelViewMatrix;
 struct Light {
     bool IsEnabled;
     vec3 Color;
-    vec3 Position; // in view space
+    vec3 Position;
 
     // Attenuation coefficients
     float ConstantAttenuation;
@@ -30,6 +31,9 @@ uniform int iNumLights;
 uniform vec3 iEyeDirection;
 uniform float iShininess;
 uniform float iStrength;
+
+uniform float iEdgeThickness;
+uniform vec4 iEdgeColor;
 
 const int NumMaxLights = 20;
 uniform Light iLights[NumMaxLights];
@@ -141,12 +145,16 @@ void main() {
     }
 
     float edge_dist = min(min(fragment_in.d[0], fragment_in.d[1]),
-            fragment_in.d[2]) /0.001;
+            fragment_in.d[2]) / iEdgeThickness;
+
+    // 4^(-d^2) = 0.00017
+    if (edge_dist > 2.5 || iEdgeThickness < 1e-7) {
+        FragmentColor = col;
+        return;
+    }
 
     float edge_intensity = pow(4, -pow(edge_dist, 2));
-    vec4 edge_col = vec4(0, 0, 0, 0);
-
-    FragmentColor = mix(col, edge_col, edge_intensity);
+    FragmentColor = mix(col, iEdgeColor, edge_intensity);
 }
 
 #endif
