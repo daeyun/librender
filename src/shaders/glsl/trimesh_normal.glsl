@@ -106,13 +106,13 @@ mat4 RotationMatrix(vec3 axis, float angle) {
 
 //-----------------------------------------------------------------------------
 void main() {
-    /*// Compute face normal. Counter-clockwise winding. cross(P1-P0, P2-P0)*/
+    // Compute face normal. Counter-clockwise winding. cross(P1-P0, P2-P0)
     vec3 face_normal = normalize(cross(
         gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz,
         gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz
     ));
 
-    /*// Center of the triangle. (P0+P1+P2)/3*/
+    // Center of the triangle. (P0+P1+P2)/3
     vec4 face_center = vec4((gl_in[0].gl_Position.xyz +
                             gl_in[1].gl_Position.xyz +
                             gl_in[2].gl_Position.xyz) / 3.0, 1.0);
