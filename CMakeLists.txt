@@ -17,7 +17,6 @@ find_package(GLEW REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
 
-
 set(CORELIBS ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${ARMADILLO_LIBRARIES} ${Boost_LIBRARIES} ${OPENGL_LIBRARY} ${YAMLCPP_LIBRARY})
 set(INCLUDE_DIRS ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 
@@ -28,6 +27,8 @@ if (DEBUG)
 else()
     set(CMAKE_CXX_FLAGS "-Ofast")
 endif()
+
+link_directories(${GLFW_LIBRARY_DIRS})
 
 add_definitions(-std=c++11)
 
@@ -46,7 +47,7 @@ add_definitions(-std=c++11)
 # Used by both src and test
 include_directories(${LIBRENDER_SOURCE_DIR}/src)
 include_directories(${LIBRENDER_SOURCE_DIR}/src/third_party/tinyobjloader)
-include_directories(${GLEW_INCLUDE_DIRS})
+include_directories(${INCLUDE_DIRS})
 
 add_subdirectory(src)
 

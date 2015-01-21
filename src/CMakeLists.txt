@@ -1,8 +1,4 @@
-if (DEBUG OR TEST)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LIBRENDER_SOURCE_DIR}/bin-dev)
-else()
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LIBRENDER_SOURCE_DIR}/bin)
-endif()
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LIBRENDER_SOURCE_DIR}/bin)
 
 # Get all files except for ./src/main.cc and make them a library.
 file(GLOB_RECURSE INCLUDES "*.h" "*.cpp" "*.cc")
