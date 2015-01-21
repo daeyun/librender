@@ -1,0 +1,6 @@
+[submodule "lib/libigl"]
+	path = lib/libigl
+	url = git@github.com:libigl/libigl.git
+[submodule "lib/eigen"]
+	path = lib/eigen
+	url = git@github.com:RLovelett/eigen.git
