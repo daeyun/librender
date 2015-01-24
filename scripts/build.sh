@@ -10,6 +10,7 @@ OPTS=${OPTS//--lldb/}
 OPTS=${OPTS//--debug/}
 OPTS=${OPTS//--run/}
 OPTS=${OPTS//--clean/}
+OPTS=${OPTS//--xcode/}
 
 function yellow {
 tput setaf 3 && echo "$1" && tput sgr0
@@ -30,10 +31,10 @@ fi
 CMAKE_ARGS="-H. "
 MAKE_ARGS=""
 
-if [[ $@ =~ (--test|--debug) ]]; then
-CMAKE_ARGS+="-Bbuild-dev "
-MAKE_ARGS+="-Cbuild-dev"
-BIN_DIR="bin-dev"
+if [[ $@ =~ (--xcode) ]]; then
+CMAKE_ARGS+="-Bbuild-xcode "
+MAKE_ARGS+="-Cbuild-xcode "
+BIN_DIR="bin"
 else
 CMAKE_ARGS+="-Bbuild "
 MAKE_ARGS+="-Cbuild"
@@ -52,6 +53,10 @@ if [[ $@ =~ (--debug) ]]; then
 CMAKE_ARGS+="-DDEBUG=ON "
 else
 CMAKE_ARGS+="-DDEBUG=OFF "
+fi
+
+if [[ $@ =~ (--xcode) ]]; then
+CMAKE_ARGS+="-G Xcode "
 fi
 
 if [[ $@ =~ (--gen) ]]; then
