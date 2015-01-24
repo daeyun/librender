@@ -9,7 +9,7 @@ project(LIBRENDER)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 find_package(OpenGL REQUIRED)
-find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
+find_package(Boost COMPONENTS program_options filesystem system coroutine REQUIRED)
 find_package(YamlCpp REQUIRED)
 find_package(Armadillo REQUIRED)
 find_package(GLEW REQUIRED)
@@ -47,6 +47,8 @@ add_definitions(-std=c++11)
 # Used by both src and test
 include_directories(${LIBRENDER_SOURCE_DIR}/src)
 include_directories(${LIBRENDER_SOURCE_DIR}/src/third_party/tinyobjloader)
+include_directories(${LIBRENDER_SOURCE_DIR}/lib/eigen)
+include_directories(${LIBRENDER_SOURCE_DIR}/lib/libigl/include)
 include_directories(${INCLUDE_DIRS})
 
 add_subdirectory(src)
